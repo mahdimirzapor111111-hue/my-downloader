@@ -1,15 +1,15 @@
-name: AVASAM - Mirror Websites
+name: AVASAM - Safe Website Downloader
 
 on:
   workflow_dispatch:
     inputs:
       urls:
-        description: 'Space-separated list of website URLs to mirror'
+        description: 'Space-separated list of website URLs'
         required: true
         type: string
 
 jobs:
-  mirror-sites:
+  download:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -17,21 +17,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install wget
+      - name: Install tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget
+          sudo apt-get install -y wget curl
 
-      - name: AVASAM Website Mirror - https://avasam.ir
-        run: |
-          echo "🏷️  AVASAM - Website Mirror"
-          echo "🌐 https://avasam.ir"
-          echo ""
-
-      - name: Mirror websites
+      - name: Download websites safely
         run: |
           URLS="${{ github.event.inputs.urls }}"
           mkdir -p sites
@@ -39,9 +31,13 @@ jobs:
           for URL in $URLS; do
             SAFE_NAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]/_/g')
             TARGET_DIR="sites/${SAFE_NAME}"
+            HTML_FILE="${TARGET_DIR}.html"
 
-            echo "🕸 Mirroring $URL -> $TARGET_DIR"
+            echo "🌐 Processing $URL"
 
+            mkdir -p "$TARGET_DIR"
+
+            echo "🕸 Trying full mirror..."
             wget \
               --mirror \
               --convert-links \
@@ -49,30 +45,18 @@ jobs:
               --page-requisites \
               --no-parent \
               -P "$TARGET_DIR" \
-              "$URL"
+              "$URL" || echo "⚠️ Mirror failed, falling back to HTML-only"
+
+            echo "📄 Saving HTML fallback"
+            curl -L --fail "$URL" -o "$HTML_FILE" || echo "❌ Could not download HTML"
           done
 
-      - name: Commit & Push mirrored sites (AVASAM)
+      - name: Commit & Push
         run: |
-          BRANCH="${GITHUB_REF_NAME}"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          echo "🏷️  AVASAM (https://avasam.ir) - Preparing to commit mirrored sites"
-
-          mapfile -t ALL_FILES < <(git ls-files --others --modified --exclude-standard sites/)
-
-          TOTAL=${#ALL_FILES[@]}
-          echo "📦 Total files to push: $TOTAL"
-
-          if [ "$TOTAL" -eq 0 ]; then
-            echo "Nothing to commit"
-            exit 0
-          fi
-
-          git add "${ALL_FILES[@]}"
-          git commit -m "[AVASAM] Add mirrored websites [skip ci]"
-          git pull --rebase origin "$BRANCH"
-          git push origin HEAD:"$BRANCH"
-
-          echo "🎉 All $TOTAL mirrored files pushed — AVASAM (https://avasam.ir)"
+          git add sites/
+          git commit -m "[AVASAM] Website download" || echo "Nothing to commit"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
