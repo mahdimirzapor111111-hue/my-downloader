@@ -1,142 +1,35 @@
-name: AVASAM-SITE-ULTRA-NO-ERROR
-
-on:
-  workflow_dispatch:
-    inputs:
-      urls:
-        description: 'Space-separated list of website URLs'
-        required: true
-        type: string
-
-jobs:
-  ultra:
-    runs-on: ubuntu-latest
-
-    container:
-      image: mcr.microsoft.com/playwright:v1.44.0-jammy
-      options: --ipc=host
-
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Node.js + Playwright (Node version)
+- name: Download websites safely (assets-focused)
         run: |
-          apt-get update
-          apt-get install -y nodejs npm
-          npm init -y
-          npm install playwright
+          URLS="${{ github.event.inputs.urls }}"
+          mkdir -p sites
 
-      - name: Create ULTRA script
-        run: |
-          cat << 'EOF' > ultra.js
-          const fs = require('fs');
-          const path = require('path');
-          const { chromium } = require('playwright');
+          for URL in $URLS; do
+            SAFE_NAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]/_/g')
+            TARGET_DIR="sites/${SAFE_NAME}"
+            HTML_FILE="${TARGET_DIR}.html"
 
-          async function autoScroll(page) {
-            await page.evaluate(async () => {
-              await new Promise(resolve => {
-                let totalHeight = 0;
-                const distance = 500;
-                const timer = setInterval(() => {
-                  const scrollHeight = document.body.scrollHeight;
-                  window.scrollBy(0, distance);
-                  totalHeight += distance;
+            echo "🌐 Processing $URL"
+            mkdir -p "$TARGET_DIR"
 
-                  if (totalHeight >= scrollHeight - window.innerHeight) {
-                    clearInterval(timer);
-                    resolve();
-                  }
-                }, 300);
-              });
-            });
-          }
+            echo "🕸 Deep mirror with assets..."
+            wget \
+              --recursive \
+              --level=3 \
+              --page-requisites \
+              --convert-links \
+              --adjust-extension \
+              --no-parent \
+              --span-hosts \
+              --domains=$(echo "$URL" | awk -F/ '{print $3}') \
+              --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
+              --accept="html,htm,css,js,jpg,jpeg,png,gif,webp,svg,mp4,webm,ogg,mp3,woff,woff2,ttf,otf" \
+              --timeout=20 \
+              --tries=3 \
+              -P "$TARGET_DIR" \
+              "$URL" || echo "⚠️ Mirror failed, falling back to HTML-only"
 
-          async function downloadSite(url, outDir) {
-            console.log("🌐 ULTRA capture:", url);
-
-            if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
-
-            const browser = await chromium.launch({ headless: true });
-            const page = await browser.newPage();
-
-            const assets = new Set();
-            const apis = new Map();
-
-            page.on('response', async (response) => {
-              try {
-                const req = response.request();
-                const resourceUrl = req.url();
-
-                if (!resourceUrl.startsWith("http")) return;
-
-                const ct = response.headers()['content-type'] || "";
-
-                if (ct.includes("application/json")) {
-                  apis.set(resourceUrl, await response.text());
-                }
-
-                const ext = path.extname(resourceUrl).split("?")[0];
-                const allowed = ['.png','.jpg','.jpeg','.gif','.webp','.svg','.css','.js','.mp4','.webm','.woff','.woff2','.ttf','.otf','.json'];
-
-                if (allowed.includes(ext)) {
-                  assets.add(resourceUrl);
-                }
-              } catch {}
-            });
-
-            await page.goto(url, { waitUntil: 'networkidle' });
-            await autoScroll(page);
-
-            const html = await page.content();
-            fs.writeFileSync(path.join(outDir, "index.html"), html);
-
-            console.log("📦 Assets:", assets.size);
-            console.log("📡 API responses:", apis.size);
-
-            for (const [apiUrl, body] of apis.entries()) {
-              const clean = apiUrl.replace(/https?:\/\//, '').replace(/[^\w.-]/g, '_');
-              fs.writeFileSync(path.join(outDir, clean + ".json"), body);
-            }
-
-            for (const assetUrl of assets) {
-              try {
-                const res = await page.request.get(assetUrl);
-                const buffer = await res.body();
-
-                const clean = assetUrl.replace(/https?:\/\//, '').replace(/[^\w.-]/g, '_');
-                const filePath = path.join(outDir, clean);
-
-                fs.writeFileSync(filePath, buffer);
-              } catch (e) {
-                console.log("⚠️ Failed asset:", assetUrl);
-              }
-            }
-
-            await browser.close();
-            console.log("✅ ULTRA capture complete:", url);
-          }
-
-          const urls = process.argv.slice(2);
-          for (const url of urls) {
-            const safe = url.replace(/https?:\/\//, '').replace(/[^\w.-]/g, '_');
-            downloadSite(url, `sites/${safe}`);
-          }
-          EOF
-
-      - name: Run ULTRA engine
-        run: |
-          node ultra.js ${{ github.event.inputs.urls }}
-
-      - name: Commit & Push
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add sites/
-          git commit -m "[ULTRA-NO-ERROR] Snapshot" || echo "Nothing to commit"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin HEAD:"${GITHUB_REF_NAME}"
+            echo "📄 Saving HTML fallback"
+            curl -L --fail \
+              -H "User-Agent: Mozilla/5.0" \
+              "$URL" -o "$HTML_FILE" || echo "❌ Could not download HTML"
+          done
