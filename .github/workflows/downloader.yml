@@ -1,4 +1,4 @@
-name: AVASAM-SITE-PRO-MAX
+name: AVASAM-SITE-ULTRA
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         type: string
 
 jobs:
-  promax:
+  ultra:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,32 +18,61 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Playwright + Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget curl nodejs npm
+          sudo apt-get install -y \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+            libxkbcommon0 libxcomposite1 libxdamage1 libxrandr2 libgbm1 \
+            libasound2 libpangocairo-1.0-0 libpango-1.0-0 libcairo2 \
+            libatspi2.0-0 libx11-xcb1 libxshmfence1 zip
 
-      - name: Install Playwright
-        run: |
           npm install -g playwright
           playwright install chromium
 
-      - name: Create PRO-MAX script
+      - name: Create ULTRA script
         run: |
-          cat << 'EOF' > promax.js
+          cat << 'EOF' > ultra.js
           const fs = require('fs');
           const path = require('path');
           const { chromium } = require('playwright');
 
+          async function autoScroll(page) {
+            await page.evaluate(async () => {
+              await new Promise(resolve => {
+                let totalHeight = 0;
+                const distance = 500;
+                const timer = setInterval(() => {
+                  const scrollHeight = document.body.scrollHeight;
+                  window.scrollBy(0, distance);
+                  totalHeight += distance;
+
+                  if (totalHeight >= scrollHeight - window.innerHeight) {
+                    clearInterval(timer);
+                    resolve();
+                  }
+                }, 300);
+              });
+            });
+          }
+
           async function downloadSite(url, outDir) {
-            console.log("🌐 Starting PRO-MAX capture:", url);
+            console.log("🌐 ULTRA capture:", url);
 
             if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-            const browser = await chromium.launch();
-            const page = await browser.newPage();
+            const browser = await chromium.launch({
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
 
+            const page = await browser.newPage();
             const assets = new Set();
+            const apis = new Map();
 
             page.on('response', async (response) => {
               try {
@@ -52,8 +81,14 @@ jobs:
 
                 if (!resourceUrl.startsWith("http")) return;
 
+                const ct = response.headers()['content-type'] || "";
+
+                if (ct.includes("application/json")) {
+                  apis.set(resourceUrl, await response.text());
+                }
+
                 const ext = path.extname(resourceUrl).split("?")[0];
-                const allowed = ['.png','.jpg','.jpeg','.gif','.webp','.svg','.css','.js','.mp4','.webm','.woff','.woff2','.ttf','.otf'];
+                const allowed = ['.png','.jpg','.jpeg','.gif','.webp','.svg','.css','.js','.mp4','.webm','.woff','.woff2','.ttf','.otf','.json'];
 
                 if (allowed.includes(ext)) {
                   assets.add(resourceUrl);
@@ -63,10 +98,18 @@ jobs:
 
             await page.goto(url, { waitUntil: 'networkidle' });
 
+            await autoScroll(page);
+
             const html = await page.content();
             fs.writeFileSync(path.join(outDir, "index.html"), html);
 
-            console.log("📦 Downloading assets:", assets.size);
+            console.log("📦 Assets:", assets.size);
+            console.log("📡 API responses:", apis.size);
+
+            for (const [apiUrl, body] of apis.entries()) {
+              const clean = apiUrl.replace(/https?:\/\//, '').replace(/[^\w.-]/g, '_');
+              fs.writeFileSync(path.join(outDir, clean + ".json"), body);
+            }
 
             for (const assetUrl of assets) {
               try {
@@ -83,7 +126,7 @@ jobs:
             }
 
             await browser.close();
-            console.log("✅ PRO-MAX capture complete:", url);
+            console.log("✅ ULTRA capture complete:", url);
           }
 
           const urls = process.argv.slice(2);
@@ -93,21 +136,15 @@ jobs:
           }
           EOF
 
-      - name: Run PRO-MAX engine
+      - name: Run ULTRA engine
         run: |
-          node promax.js ${{ github.event.inputs.urls }}
+          node ultra.js ${{ github.event.inputs.urls }}
 
-      - name: Fallback Mirror (if needed)
+      - name: Zip results
         run: |
-          URLS="${{ github.event.inputs.urls }}"
-          for URL in $URLS; do
-            SAFE=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g')
-            DIR="sites/${SAFE}"
-
-            if [ ! -f "$DIR/index.html" ]; then
-              echo "⚠️ PRO-MAX failed, running wget mirror..."
-              wget --mirror --convert-links --adjust-extension --page-requisites --no-parent -P "$DIR" "$URL" || true
-            fi
+          cd sites
+          for d in */ ; do
+            zip -r "${d%/}.zip" "$d"
           done
 
       - name: Commit & Push
@@ -115,6 +152,6 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add sites/
-          git commit -m "[AVASAM-SITE-PRO-MAX] Full website snapshot" || echo "Nothing to commit"
+          git commit -m "[AVASAM-SITE-ULTRA] Full website snapshot" || echo "Nothing to commit"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin HEAD:"${GITHUB_REF_NAME}"
