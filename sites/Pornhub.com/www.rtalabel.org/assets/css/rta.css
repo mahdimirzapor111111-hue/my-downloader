@@ -1,0 +1,693 @@
+/**** where most of the RTA stuff is ****/
+.rta-default { 
+	font-size: 20px;
+}
+
+.section {
+	text-align: left;
+}
+
+.center {
+	text-align: center;
+}
+
+.container-background {
+	background-color: #011B3D; /* #021945; */
+}
+
+#secondaryNav {
+	/* text-shadow: 0 0 2px #02478A; this doesn't seem to do anything? */
+}
+
+.rta-webmasters-section a {
+	color: #fff;
+	font-weight: normal;
+}
+
+.rta-parents-section .heading {
+	color: #166FB3;
+}
+
+.rta-webmasters-section .description,
+.rta-webmasters-section .heading {
+	color: #fff;
+	font-weight: bold;
+}
+
+.rta-webmasters-section {
+	background: #035AA7;
+/*	background: #047BD6; */
+/*	background: #06B1E5; */
+}
+
+.press_year {
+	font-weight: bold;
+	text-decoration: underline;
+	padding-top: 10px;
+}
+
+.newstext {
+	text-align: left;
+}
+
+.newstext h1 {
+	font-weight: bold;
+	text-align: center;
+}
+
+.header-social .donate a,
+.header-social .donate {
+	background: #047BD6;
+	color: #fff;
+}
+
+.header-social .donate:hover {
+	background: #06B1E5; 
+}
+
+h3 .heading {
+	color: #fff;
+}
+
+.latest-news-section {
+	text-align: center;
+	padding-top: 10px;
+	background-color: #035AA7; /* #021945; */
+	color: #fff;
+}
+
+.info-section .info-item.info-report {
+	background: #FF1F27;
+}
+
+.footer .description {
+	color: #ddd;
+}
+
+.footer .description a {
+	color: #fff;
+	font-weight: 600;
+}
+
+img.waiting {
+	max-width: 120px;
+	margin: 120px;
+}
+
+div.waiting {
+	margin-top: -60px;
+	margin-bottom: 60px;
+    color: #166fb3;
+}
+
+.rta-default h2 a,
+.rta-default h2,
+.rta-default h3, .h3 {
+	font-size: 32px;
+    color: #166fb3;
+}
+
+.rta-default a {
+	/* font-weight: 700; */
+	cursor: pointer;
+}
+
+.rta-default h2 {
+	font-size: 36px;
+	margin-bottom: 30px;
+}
+
+div.legacy-page {
+	max-width: 90%;
+}
+
+li {
+	text-align: left;
+}
+
+ul#best_practices_ul1 {
+	list-style-type: none;
+	padding: 0;
+}
+
+ul#best_practices_ul1 li {
+	text-align: center;	
+}
+
+.floatleft { float: left; }
+.floatright { float: right; }
+.floatnone { clear: both; }
+.content { text-align: left; }
+.content.spacer { text-align: center; padding-left: 14px; padding-right: 20px; }
+.content.article.title { text-align: center; font-weight: bolder; padding-bottom: 20px; }
+.content h2,
+.content h3,
+.h3 { 
+	text-align: center; text-transform: uppercase; 
+}
+
+#donate-top {
+	text-align: center;
+	max-width: 992px;
+}
+
+.rta-default h1.donation {
+	font-style: italic;
+	font-weight: bold;
+	font-size: 40px;
+}
+
+h4.donate.emph, h4.donation.emph, .donation.emph, .donate.emph {
+	font-size: 20px;
+	font-style: italic;
+}
+h3.donation {
+	font-size: 32px;
+}
+h4.donation,
+h2, h2.donation, 
+h2.donation.subtitle {
+	font-size: 32px;
+}
+.content.donation.ital {
+	font-size: 16px;
+	text-align: center;
+}
+
+.donation,.content.donation,.content.donation.ital {
+	margin-top: 15px;
+	margin-left: 17px;
+	margin-right: 20px;
+}
+
+.donation.difference {
+	margin-top: 25px;
+	font-style: italic;
+}
+
+table.donation.donate {
+	margin-top: 10px;
+}
+
+.donation.emph {
+	font-weight: bold;
+	font-style: italic;
+}
+
+.donation.donoramt {
+	margin-top: 12px;
+	/* font-size: 13px; */
+}
+
+div.donation.banner {
+	border: 1px #064861 solid;
+	margin: 5px;
+	padding: 5px;
+}
+
+div.donation td {
+	padding-left: 40px;
+	padding-right: 40px;
+}
+
+.donation.ital, donation.ital a {
+	font-style: italic;
+}
+
+h1.donation {
+}
+
+h2, h2.donation {
+	letter-spacing: 0;
+}
+
+ul.donation {
+}
+
+ul.donation li {
+	padding-bottom: 8px;
+}
+
+a:hover {
+	font-weight: inherit;
+}
+h2.difference {
+	margin-top: 50px;
+	padding-bottom: 0;
+ 	margin-bottom: 0;
+}
+
+/* for the actual page - needed for opera for e.g. */
+.social-links {
+	margin-right: -24px;
+}
+
+.content.award .quote,
+.content.award .text {
+	font-size: smaller;
+}
+
+.content.award .quote {
+	font-style: italic;
+}
+
+.content.award .title {
+	font-weight: 700;
+	color: #63aab5;
+	text-align: center;
+	padding: 10px 10px;
+}
+#awards_div2 {
+	max-width: 1092px;
+	padding-left: 150px;
+}
+
+div.rta-contact {
+	width: 50%;
+	border: 1px solid #999999; 
+	color: #000000; 
+	background-color: #dbe4ec; 
+	padding: 10px 10px 10px 20px;
+}
+
+.rta-howtobox {
+/* style="border: 1px solid #173a62; padding: 10px; background-color:#fdfdd4" */
+	border: 1px;
+	padding: 10px;
+	background: #FFFEDE;
+}
+
+.rtachecker {
+/* style="width: 570px; border: 1px solid #999999; color: #000000; background-color: #dbe4ec; padding: 10px 10px 10px 20px;" */
+}
+
+.instructions4webmasters {
+	font-weight: bold;
+}
+
+div.rta-verified {
+/* style="width: 570px; border: 1px solid #999999; color: #000000; background-color: #dbe4ec; pa    dding: 10px 10px 10px 20px;" */
+}
+
+div.rta-validate {
+/* style="width: 570px; border: 1px solid #999999; color: #000000; background-color: #dbe4ec    ; padding: 10px 10px 10px 20px;" */
+}
+
+div.rta-terms {
+/* style="width: 570px; border: 1px solid #999999; color: #000000; background    -color: #dbe4ec; padding: 10px 10px 10px 20px;" */
+}
+
+div.rta-index {
+/* style="width: 570px; border: 1px solid #999999; color: #000000; background-color: #dbe4ec; padding: 10px 10px 10px 20px;" */
+}
+
+div.rta-faq {
+/* style="width: 550px; border: 1px solid #999999; color: #000000; background-    color: #dbe4ec; padding: 10px 10px 10px 20px;" */
+}
+
+div.howtobox {
+	text-align: left;
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+}
+
+textarea.rtaplus-code,
+textarea.howto-code {
+	font-family: courier, fixed-width;
+	width: 100%;
+}
+
+div.codediv {
+	font-weight: bold;
+	font-family: courier, fixed-width;
+}
+
+.section ul, .section ol {
+	padding: 20px 0px 20px 50px;
+}
+
+.section h2,
+.section h3 {
+	padding: 20px 10px 10px 10px;
+}
+
+.legacy-page div:not(.modal.show),
+.legacy-page table {
+	max-width: 992px;
+}
+
+.content.awards h3 {
+	padding: 40px 10px 10px 0px;
+	margin-bottom: -20px;
+}
+
+.content.awards td.img {
+	width: 20%;
+	text-align: right;
+}
+
+li.faq a {
+	font-weight: 700;
+}
+li.faq p a {
+	font-weight: 400;
+}
+ol.faq.answers {
+	padding-bottom: 5px;
+	padding-top: 10px;
+}
+ol.faq {
+	padding-left: 10px;
+}
+
+ol.faq.questions li a {
+	font-weight: 400;
+}
+ol.faq.questions li a:hover {
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.content.article.title {
+	padding-top: 20px;
+}
+
+.content.memberdetail ul {
+	max-width: 500px;
+}
+
+ul.content.members {
+    max-width: 240px;
+	text-align: center;
+	list-style-type: none;
+}
+
+div.content.member.disclaimer {
+	font-size: smaller;
+	padding-top: 30px;
+}
+
+#members_div4 {
+	text-align: left;
+}
+
+ul#ul-news,
+ul#ul-parents,
+ul#ul-resources,
+.navbar-nav .dropdown-menu {
+	background: #fff;
+}
+
+.navbar-nav .dropdown-menu li, 
+.navbar-nav .dropdown-menu a {
+	color: #fff;
+	background-color: #000; 
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.navbar-nav .dropdown-menu li a:focus,
+.navbar-nav .dropdown-menu li a:hover {
+	color: rgba(255, 255, 255, .75);
+	text-decoration: none;
+}
+
+ul#best_practices_ul1 {
+	margin-top: 40px;
+	margin-bottom: 100px;
+	margin-left: 10px;
+}
+ul#best_practices_ul1 li {
+	padding: 3px;
+}
+
+div#webmaster-sub {
+	padding: 10px;
+	text-align: center;
+}
+
+h4.content.webmasters {
+	text-align: center;
+	padding-top: 10px;
+    color: #166fb3;
+	font-weight: 400;
+}
+
+ul.content.webmasters {
+	max-width: 992px;
+	list-style: none;
+}
+
+/* for news with images */
+p.MsoNormal img {
+	padding-right: 10px;
+}
+
+div.apply-input,
+div.renew-input,
+div#renew-input {
+	padding: 10px;
+}
+
+input.url-inputs {
+	float: right;
+}
+.error {
+	color: red;
+}
+
+.hide {
+	display: none;
+}
+
+.faded {
+	pointer-events: none;
+	opacity: 0.5;
+	filter: alpha(opacity=5);
+}
+
+.adsense {
+	text-align: center;
+}
+
+.ivisa-banner {
+	margin-bottom: 5px;
+}
+
+@media (min-width: 992px) {
+div.legacy-page {
+	max-width: 992px;
+}
+div#instr {
+	max-width: 992px;
+}
+div.info-form {
+	max-width: 660px;
+}
+.info-form .apply-input,
+.info-form .renew-input {
+	font-size: 20px;
+}
+.info-form h4.apply-input,
+.info-form h4.renew-input {
+	font-size: 32px;
+}
+h3, .h3 {
+	font-size: 1.75 rem;
+}
+ol.faq {
+	padding-left: 30px;
+}
+.banner {
+	height: 366px;
+}
+}
+
+/* prevent ragged looking boxes with ipad */
+@media (max-width: 1024px) {
+.protecting-children-section .items .item .content-box .title {
+	min-height: 140px;
+}
+.protecting-children-section .items .item .content-box .subtitle {
+	min-height: 60px;
+}
+div.rta-contact {
+	width: 100%;
+}
+}
+
+/* prevent ragged looking boxes with ipad */
+@media (max-width: 768px) {
+.protecting-children-section .items .item .content-box .title {
+	min-height: 50px;
+}
+.protecting-children-section .items .item .content-box .subtitle {
+	min-height: 45px;
+}
+.submit-creator-button {
+  float: right;
+  width: 60%;
+}
+textarea.howto-code,
+textarea.rtaplus-code,
+textarea {
+	width: 100%;
+}
+}
+
+/* fixes issues with reporting modal among other things */
+@media (max-width: 992px) {
+.banner {
+	/* adding this here prevents the banner from expanding when menu expands */
+	/* height: 266px; */
+}
+.h3, h3 {
+	font-size: 20px;
+}
+.h2, h2 {
+	font-size: 24px;
+}
+.section h3 {
+	font-size: 18px;
+	padding: 10px 5px 5px 5px;
+}
+.section h2 a {
+	font-size: 20px;
+}
+.section h2 {
+	font-size: 20px;
+	padding: 10px 5px 5px 5px;
+}
+.modal-dialog {
+	overflow: hidden;
+    /* used just in case next rule is not recognized */
+	max-width: 280px;
+	/* percentage of viewport to use */
+	max-width: 96vw;
+} 
+h4 {
+	font-size: 16px;
+}
+.info-form p {
+	font-size: 13px;
+}
+.content.best_practices {
+	padding-left: 0;
+}
+ol.faq.questions li {
+	padding-top: 5px;
+	padding-bottom: 3px;
+}
+.content.parental_guidelines ul,
+.content.parental_guidelines ol,
+ul.content.webmasters, 
+ol.content.webmasters, 
+.content.best_practices ul, 
+.content.best_practices ol, 
+.content.best_practices ol ol {
+	padding-left: 8px;
+}
+.content.sponsor-benefits ul {
+	padding-left: 20px;
+}
+#report_table1 {
+	display: none;
+}
+#report_form h3 {
+	margin-left: -15px;
+}
+.inputs, .submit {
+	font-size: 13px;
+	margin-top: 7px;
+	margin-bottom: 7px;
+	max-width: 100%;
+}
+.truncate {
+	display: none;
+}
+#awards_div2 {
+	padding-left: 0;
+}
+table.content.awards {
+	max-width: 70%;
+}
+.content.awards td.img {
+	max-width: 40%;
+}
+.rta-default h1.donation {
+	font-size: 24px;
+}
+h4.donate.emph, h4.donation.emph, .donation.emph, .donate.emph {
+	font-size: 16px;
+}
+h3.donation {
+	font-size: 21px;
+}
+h4.donation,
+h2, h2.donation, 
+h2.donation.subtitle {
+	font-size: 21px;
+}
+h4.paypal {
+	padding-top: 10px;
+	padding-bottom: 3px;
+	font-size: 16px;
+}
+ul#best_practices_ul1 {
+	margin-top: 20px;
+	margin-bottom: 50px;
+	margin-left: 5px;
+}
+ul#best_practices_ul1 li {
+	padding: 3px;
+}
+#best_practices_div1 h3 {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.content.best_practices div,
+.content.best_practices ul,
+.content.best_practices ol 
+{
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+.adv-detail,
+.annual-fee {
+	display: none;
+}
+.nav-item a {
+	font-weight: bold;
+}
+/* attempt to make links more visible on phones */
+#secondaryNav a:hover {
+	color: #fff;
+	text-decoration: underline;
+}
+#secondaryNav {
+	font-weight: bold;
+}
+.rta-default {
+	font-size: 16px;
+}
+}
+
+@media (max-width: 660px) {
+.protecting-children-section .items .item .content-box .title {
+	min-height: 0;
+}
+.protecting-children-section .items .item .content-box .subtitle {
+	min-height: 0;
+}
+.ivisa-banner {
+	width: 100%;
+}
+}
+
+@media all and (-ms-high-contrast: none) {
+/* ie 11 specifically doesn't display the social icons the same as ff and chrome  */
+.social-links a.social-item {
+	transform: translateY(40%);
+}
+}
+

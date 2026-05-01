@@ -1,0 +1,43 @@
+strong {
+	/* font-size: 13px; */
+	font-weight: bold;
+}
+td#report-img-td {
+	text-align: center;	
+	width: 451px;
+	height: 451px;
+	padding-bottom: 40px;
+}
+td#report-img-td a, 
+td#report-img-td a h1 { 
+	margin-top: -220px;
+	font-weight: bold;
+	font-size: 24pt;
+	color: white;
+	text-transform: uppercase;
+	text-decoration: none;
+	text-align: center;	
+}
+td#report-img-td a:hover {
+	text-decoration: underline;
+} 
+.content.report.hilite {
+	color: red;
+	font-weight: normal;
+}
+.content.report td,
+.content.report form {
+	text-align: left;
+}
+.content.report form {
+	max-width: 460px;
+}
+.cpr-header {
+	font-weight: 700;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+.cpr-error {
+	padding-top: 10px;
+}
+

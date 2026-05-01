@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<title>Free live video chat</title>
+
+<meta name="description" content="live">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<script src="https://cdn.nsimg.net/cache/landing/common/20190325/sanTracking.js"></script>
+
+
+<!-- Google Tag Manager -->
+            <script>
+        (function() {
+            window.dataLayer = window.dataLayer || [];
+            const GTMUrlKeys = ['gtm.oldUrl', 'gtm.newUrl', 'gtm.newUrlFragment', 'gtm.oldUrlFragment', 'gtm.errorUrl', 'gtm.elementUrl', 'virtualPage'];
+            // Personal Identifiable Information Params
+            const blockList = new Set(['address', 'city', 'cvc', 'cvv', 'email', 'ipaddress', 'ipaddy', 'last4', 'name', 'nickname', 'pass', 'password', 'payment_subtype', 'payment_type', 'phone', 'postalcode', 'pwd', 'sabasic', 'sakey', 'sapwd', 'sausr', 'state', 'token', 'userid', 'username', 'zip', 'zipcode']);
+            function sanitizeDataUrl(urlString) {
+                const [urlWithoutQuery, queryString] = urlString.split('?');
+                const params = new URLSearchParams(queryString);
+                const cleanedParams =  new URLSearchParams();
+                params.forEach(function (value, key) {
+                    if (!blockList.has(key))
+                        cleanedParams.append(key, value);
+                });
+                return [urlWithoutQuery, cleanedParams.toString()].join('?').replace(/\?=?$/, '');
+            }
+            const proxyHandler = {
+                apply: function (gtmPush, thisArg, pageEvents) {
+                    pageEvents.forEach((pageEvent) => {
+                        GTMUrlKeys.forEach((key) => {
+                            if (typeof pageEvent[key] === 'string') {
+                                pageEvent[key] = sanitizeDataUrl(pageEvent[key]);
+                            }
+                        });
+                    });
+                    return gtmPush.apply(thisArg, pageEvents);
+                },
+            };
+            window.dataLayer.push = new Proxy(window.dataLayer.push, proxyHandler);
+       })();
+    </script>
+            <!-- Google Tag Manager GTM-P875SX -->
+        <noscript> <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P875SX" height="0" width="0" style="display:none;visibility:hidden"></iframe> </noscript>
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-P875SX');</script>
+<!-- End Google Tag Manager-->
+            
+            <script>
+      dataLayer.push({ 
+        'isAuthenticated': 'false',
+'accountAgeSegment': 'null',
+'resellerGoogleAnalyticsId': '',
+'resellerGoogleTagManagerId': '',
+'userType': 'Guest'
+      });
+    </script>
+          <!-- End Google Tag Manager-->
+
+
+<script type="text/javascript">
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:2165171,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+	
+	/*Normalizing*/
+	html,body,div,nav,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,
+	code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,
+	form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,
+	header,hgroup,menu,section,summary,time,mark,audio,video {
+		margin: 0px;
+		padding: 0px;
+		border: 0px;
+		outline: 0px;
+	}
+
+	/*Remove native touchstart css effect on mobile safari*/
+	html {
+		-webkit-tap-highlight-color: rgba(0,0,0,0);
+		width: 100vw;
+		overflow-x: hidden;
+	}
+
+	body {
+		font-family: 'Roboto', sans-serif;
+		width: 100vw;
+		background: #191919;
+		padding-top: 50px;
+		overflow-x: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	main, section {
+		width: 100vw;
+	}
+
+	/*Link styles and cover-all link styles*/
+	a {
+		text-decoration: none;
+	}
+
+	a.overlay {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    background: transparent;
+	}
+
+	.material-icons {
+		line-height: inherit;
+	}
+
+	/* !Top Nav | Login, Logo, Search */
+	nav {
+		position: fixed;
+		top: 0px;
+		left: 0px;
+		z-index: 4;
+		background: #000;
+		height: 50px;
+		overflow: hidden;
+		width: 100%;
+		display: flex;
+		align-items: center;
+	}
+
+	.nav-logo {
+		align-items: center;
+		width: 140px;
+		height: 50px;
+		margin-right: auto;
+		margin-left: 10px;
+	}
+
+	.nav-logo > img {
+		display: block;
+		width: 100%;
+		height: 100%;
+    	object-fit: contain;
+	}
+
+	.nav-login-btn {
+		line-height: 16px;
+		font-size: 13px;
+		text-transform: uppercase;
+		font-weight: 500;
+		width: 70px;
+		height: 50px;
+		text-align: center;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		color: #fff;
+		font-weight: 500;
+		margin-right: 10px;
+	}
+
+	.join-free-button {
+		text-align: center;
+		display: block;
+		letter-spacing: 0.5px;
+		color: #000;
+		line-height: 30px;
+		background-image: linear-gradient(-180deg, #fbe014 0%, #cd7e00 100%);
+		box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+		border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 15px;
+		cursor: pointer;
+		width: 90px;
+		margin-right: 0.5rem;
+	}
+
+	.sb-cat-stack {
+		display: block;
+		margin-top: 1px;
+	}
+
+	.sb-cat-stack > a {
+		position: relative;	
+		display: block;
+		margin-bottom: 1px;
+		color: #999999;
+		font-size: 16px;
+		font-weight: 500;
+		line-height: 40px;
+		background: #262626;	
+	}
+
+	.sb-cat-stack > a > span:nth-child(1) {
+		position: absolute;
+		left: 0px;
+		top: 0px;
+		display: block;
+		padding: 0px 10px 0px 10px;
+		height: 40px;
+		line-height: 40px;
+		text-align: center;
+		color: inherit;
+		font-size: 10px;
+		background: #333333;
+		width: 40px;
+	}
+
+	.sb-cat-stack > a > span:nth-child(1) > i {
+		color: #ACFF5B;
+		float: left;
+		font-size: 10px;
+	}
+
+	.sb-cat-stack > a > span:nth-child(2) {
+		position: relative;
+		display: block;
+		line-height: inherit;
+		font-weight: 400;
+		text-align: left;
+		text-indent: 75px;
+		color: inherit;
+	}
+
+	.sb-cat-stack > a > span:nth-child(2) > i {
+		position: absolute;
+		right: 10px;
+		top: 0px;
+		color: inherit;
+		font-size: 20px;
+	}	
+
+	/* DD02 - Dropdown Menu 2 */
+	.thumbs-menu {
+		position: fixed;
+		top: 50px;
+		left: 0px;
+		display: none;
+		z-index: 3;
+		width: 100%;
+		overflow: hidden;
+		background: rgba(0,0,0,0.90);
+		backdrop-filter: blur(4px);
+		box-shadow: 0 15px 70px 10px rgba(0,0,0,0.95);
+	}
+
+	.thumbs-menu > a > h4 {
+		color: white;
+		font-size: 16px;
+		width: 100%;
+		padding: 16px 10px;
+		text-transform: uppercase;
+	}
+
+	.thumbs-menu > a > h2 {
+		color: black;
+		line-height: 48px;
+		font-size: 16px;
+		font-weight: 700;
+		text-align: center;
+		text-transform: uppercase;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		min-width: 284px;
+		margin: 0px 10px;
+		margin-bottom: 16px;
+		padding: 0px 8px;
+		border-radius: 4px;
+		background-color: #ec1c24;
+	}
+
+	.browse-more-cams-top {
+		text-align: center;
+		font-size: 24px;
+		font-weight: bold;
+		padding-top: 10px;
+		color: #FFF;
+		position: relative;
+	}
+
+	/* !Hero Video */
+	header {
+		overflow: hidden;
+		position: relative;
+	}
+
+	header > a {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		z-index: 2;
+	}
+
+	.circle-header {
+		width: 12px;
+	    height: 12px;
+	    display: inline-block;
+	    background-color: lime;
+	    border-radius: 50%;
+	   	box-shadow: 0.3px 0.3px 0px #a9a9a9;
+	}
+
+	.video-info-real-camgirl {
+		display: block;
+		min-width: 200px;
+		top: 15px;
+		left: 15px;
+		color: #FFF;
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 20px;
+		position: absolute;
+		z-index: 1;
+	}
+
+	.video-info-live-sex {
+		display: block;
+		min-width: 200px;
+		top: 15px;
+		left: 15px;
+		color: #FFF;
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 20px;
+		position: absolute;
+		z-index: 1;
+	}
+
+	.normal-circle, .montage-circle {
+		width: 12px;
+	    height: 12px;
+	    display: inline-block;
+	    background-color: lime;
+	    border-radius: 50%;
+	    box-shadow: 0.3px 0.3px 0px #a9a9a9;
+	}
+
+	.montage-circle {
+		margin-left: 5px;
+	}
+
+	.video-info-montage-right-side {
+		display: block;
+		top: 15px;
+		right: 15px;
+		color: #FFF;
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 20px;
+		position: absolute;
+		z-index: 1;
+	}
+
+	.video-info-montage-right-side > .real-camgirl {
+		text-align: center;
+	}
+
+	.video-info-montage-right-side > .logo-container {
+		background: rgba(0,0,0,.5);
+		padding: 10px;
+		display: flex;
+		flex-direction: column;
+		justify-content: cetner;
+		border-radius: 3px;
+	}
+
+	.move-mute-icon {
+		top: 50px!important;
+	}
+
+	.video-info-montage {
+		display: block;
+		top: 15px;
+		left: 15px;
+		color: #FFF;
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 20px;
+		position: absolute;
+		z-index: 1;
+	}
+
+	.video-info-montage > .real-camgirl {
+		font-size: 18px;
+		text-transform: uppercase;
+		background: rgba(0,0,0,.5);
+		padding: 3px;
+		border-radius: 3px;
+		filter: none;
+		display: inline-block;
+	}
+
+	.video-info-montage > .real-camgirl > .live-sex {
+		text-shadow: none!important;
+		margin-right: 5px;
+	}
+
+	.stars {
+		color: yellow;
+		padding-top: 5px;
+		font-size: 17px;
+	}
+
+	.stars > i {
+		margin-right: 4px;
+		text-shadow: 0 1px 4px rgba(0,0,0,0.50);
+	}
+
+	.real-camgirl {
+		font-size: 18px;
+		text-transform: uppercase;
+		font-weight: bold;
+	    letter-spacing: 0.5px;
+	    filter: drop-shadow(0px 0px 9px #000000);
+	}
+
+	.real-camgirl > i {
+		color: lime;
+	}
+
+	.live-sex {
+		font-weight: bold;
+		letter-spacing: 0.5px;
+	}
+
+	.live-sex-opaque {
+		display: block;
+	    top: 15px;
+	    left: 15px;
+	    color: #FFF;
+	    font-size: 12px;
+	    font-weight: 400;
+	    line-height: 20px;
+	    position: absolute;
+	    z-index: 1;
+	}
+
+	.live-sex-opaque .cam-info {
+		background: rgba(0,0,0,.55);
+	    padding: 3px 6px;
+	    border-radius: 3px;
+	    width: fit-content;
+	    text-shadow: none;
+		font-size: 18px;
+    	text-transform: uppercase;
+	}
+
+	.live-sex-opaque .cam-info .circle {
+		width: 13px;
+	    height: 13px;
+	    display: inline-block;
+	    background-color: lime;
+	    border-radius: 50%;
+	}
+
+	.mute-icon {
+		width: 16px;
+		height: 16px;
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
+
+	.mute-icon > i {
+		color: #FFF;
+		cursor: pointer;
+		position: absolute;
+		top: 15px;
+		right: 30px;
+		width: 30px;
+		font-size: 32px;
+		z-index: 2;
+		height: 30px;
+		text-shadow: 0 1px 4px rgba(0,0,0,0.50);
+	}
+
+	.mute-icon > i {
+		right: 25px;
+	}
+
+	.mute-icon > i.last, .mute-icon > i.last {
+		top: 8px;
+	}
+
+	.name {
+		font-family: sans-serif;
+	    font-size: 22px;
+	    width: auto;
+	    height: auto;
+	    min-height: 20px;
+	    padding-top: 5px;
+	    color: #FFF;
+	    font-weight: 700;
+	    white-space: nowrap;
+	    text-overflow: ellipsis;
+	    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	.header-cta {
+		display: block;
+		text-align: center;
+		min-width: 200px;
+		top: 36%;
+		left: 50%;
+		transform: translateX(-50%);
+		color: #FFF;
+		font-size: 30px;
+		line-height: 50px;
+		text-transform: uppercase;
+		border-radius: 6px;
+		position: absolute;
+		z-index: 1;
+		font-family: Arial, sans-serif;
+	    font-weight: 600;
+	    padding-left: 35px;
+	    padding-right: 35px;
+	    padding-top: 5px;
+	    padding-bottom: 5px;
+	    box-shadow: 2px 8px 15px rgba(0, 0, 0, 0.5);
+	    white-space: nowrap;
+	    background: rgb(236,45,55);
+		background: #ec1c24;
+	}
+
+	.header-video {
+		width: 100%;
+		max-height: 215px;
+	    object-fit: cover;
+		object-position: top;
+	}
+
+	.darker-gradient-container {
+		position: relative;
+		width: 100%;
+		display: block;
+		height: 100%;
+	}
+
+	.darker-gradient {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border-radius: 6px;
+		background: linear-gradient(0deg, rgba(0,0,0,0.35) 0%, rgba(255,255,255,0) 45%);
+	}
+
+	.darker-gradient-footer {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border-radius: 6px;
+		background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(255,255,255,0) 73%);
+	}
+
+	/* !Live Thumbs */
+	section.live-thumbs {
+		display: flex;
+		align-items: flex-start;
+		flex-wrap: wrap;
+		width: 100%;
+		height: auto;
+	}
+
+	section.live-thumbs > a {
+	    display: flex;
+	    flex-direction: column;
+	    justify-content: flex-start;
+	    align-items: center;
+	    width: 50vw;
+		min-height: 200px;
+	    position: relative;
+	    overflow: hidden;
+		padding: 1px 2px;
+		box-sizing: border-box;
+	}
+
+	section.live-thumbs > a > img {
+		display: block;
+		position: relative;
+		height: 100%;
+		width: 100%;
+		min-height: 190px;
+		object-fit: cover;
+	}
+
+	.thumb-perf-name {
+	    display: block;
+		overflow: hidden;
+	    text-overflow: ellipsis;
+	    width: 200px;
+	}
+
+	.thumb-perf-age-co {
+		position: absolute;
+		left: 10px;
+		bottom: 5px;
+		display: block;
+		font-size: 12px;
+		font-weight: 500;
+		color: #FFFFFF;
+		width: 50%;
+		line-height: 20px;
+		z-index: 2;
+	}
+
+	.thumb-perf-age-co > i {
+		color: #02c753;
+		line-height: inherit;
+		font-size: inherit;
+		display: block;
+		float: left;
+		margin-right: 4px;
+	}
+
+	.thumb-info {
+		position: absolute;
+		right: 10px;
+		bottom: 5px;
+		display: block;
+		font-size: 12px;
+		font-weight: 500;
+		color: #FFFFFF;
+		line-height: 20px;
+		z-index: 2;
+	}
+
+	.thumb-scrim {
+		position: absolute;
+		right: 0px;
+		bottom: 0px;
+		width: 100%;
+		height: 30px;
+		background: #191919;
+		z-index: 1;
+	}
+
+	.nav-style-performer-list {
+		height: 120px;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		background: #191919;
+	}
+
+	.nav-style-performer-list > a.performer-thumbs-circular-small  {
+	    position: relative;
+	    display: flex;
+	    justify-content: space-around;
+	}
+
+	.nav-style-performer-list > a.performer-thumbs-circular-small > .thumb-container  {
+	    position: absolute;
+	    display: flex;
+	    height: 125px;
+	    width: 65px;
+	    flex-direction: column;
+	    align-items: center;
+	    justify-content: space-around;
+	}
+
+	.nav-style-performer-list > a.performer-thumbs-circular-small > .thumb-container > .small-thumb  {
+	    background-repeat: no-repeat;
+	    background-position: center top;
+	    background-size: cover;
+	    border-radius: 50%;
+	    border: 2px solid;
+	    padding: 28px;
+	    margin-top: 2px;
+	    margin-bottom: 2px;
+		border-color: #000000;
+	    box-shadow: 0 0 0 2px #ec1c24;    
+	}
+
+	.border {
+		position: absolute;
+		display: block;
+		overflow: hidden;
+		width: 125%;
+		height: 65%;
+		top: 16%;
+		left: -10%;
+		border-radius: 50%;
+		background: rgb(238,223,77);
+		background: linear-gradient(356deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		animation: borderPulse 3s ease infinite;
+		background-size: 100% 100%;
+	}
+
+	.border-large {
+		position: absolute;
+		display: block;
+		width: 155px;
+		height: 155px;
+		top: 8%;
+		left: 50%;
+		transform: translateX(-50%);
+		border-radius: 50%;
+		background: rgb(238,223,77);
+		background: linear-gradient(356deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		animation: borderPulse 3s ease infinite;
+		background-size: 100% 100%;
+	}
+
+	@keyframes borderPulse {
+		0% {
+			background: linear-gradient(356deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		5% {
+			background: linear-gradient(338deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		10% {
+			background: linear-gradient(320deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		15% {
+			background: linear-gradient(302deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		20% {
+			background: linear-gradient(284deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		25% {
+			background: linear-gradient(266deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		30% {
+			background: linear-gradient(230deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		35% {
+			background: linear-gradient(212deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		40% {
+		
+			background: linear-gradient(194deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		45% {
+			background: linear-gradient(176deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		50% {
+			background: linear-gradient(158deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		55% {
+			background: linear-gradient(140deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		60% {
+			background: linear-gradient(122deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		65% {
+			background: linear-gradient(104deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		70% {
+			background: linear-gradient(86deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		75% {
+			background: linear-gradient(68deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		80% {
+			background: linear-gradient(50deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		85% {
+			background: linear-gradient(32deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		90% {
+			background: linear-gradient(14deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		95% {
+			background: linear-gradient(4deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+		100% {
+			background: linear-gradient(356deg, rgba(238,223,77,1) 0%, rgba(236,28,36,1) 100%);
+		}
+	}
+
+	.performer {
+		position: absolute;
+		display: block;
+		overflow: hidden;
+		width: 90%;
+		height: 90%;
+		margin: 5%;
+		border-radius: 50%;
+		border: 4px solid #000000;
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+	}
+
+	.performer img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.performer-large {
+		position: absolute;
+		display: block;
+		overflow: hidden;
+		width: 95%;
+		max-width: 155px;
+		height: 95%;
+		top: 2.5%;
+		left: 2.5%;
+		border-radius: 50%;
+		border: 4px solid #000000;
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+		background-repeat: no-repeat;
+	    background-position: center top;
+	    background-size: cover;
+	}
+
+	.performer-large img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.thumb-perf-name-smaller {
+		position: relative;
+		top: 40%;
+		width: 50px;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
+	    color: #FFFFFF;
+	    text-align: center;
+	    font-size: 13px;
+	}
+
+	.live-tag {
+		background: rgba(0, 0, 0, 0.8);
+		border-radius: 3px;
+		color: #FFFFFF;
+		position: absolute;
+		z-index: 3;
+		font-family: sans-serif;
+		letter-spacing: 0.3px;
+		font-weight: normal;
+		text-align: center;
+		display: block;
+		text-transform: uppercase;
+		top: 16px;
+		left: -10px;
+		padding: 2px 4px 2px 14px;
+		font-size: 10px;
+	}
+
+	.live-tag > i {
+		background-color: lime;
+		animation: flash 1.2s linear infinite;
+		border-radius: 50%;
+		position: absolute;
+		top: 3.5px;
+		left: 3px;
+		width: 8px;
+		height: 8px;
+	}
+
+	.live-tag-large {
+		background: rgba(0, 0, 0, 0.8);
+		border-radius: 3px;
+		color: #FFFFFF;
+		text-transform: uppercase;
+		position: absolute;
+		z-index: 3;
+		font-family: sans-serif;
+		font-size: 12px;
+		letter-spacing: 0.3px;
+		font-weight: normal;
+		text-align: center;
+		display: block;
+		top: 8%;
+		padding: 4px 4px 4px 16px;
+	}
+
+	.live-tag-large > i {
+		background-color: lime;
+		animation: flash 1.2s linear infinite;
+		border-radius: 50%;
+		position: absolute;
+		top: 5.5px;
+		left: 3px;
+		width: 10px;
+		height: 10px;
+	}
+
+	.live-tag-large-thumb {
+		background: rgba(0, 0, 0, 0.8);
+		border-radius: 3px;
+		color: #FFFFFF;
+		position: absolute;
+		z-index: 3;
+		font-family: sans-serif;
+		font-size: 12px;
+		letter-spacing: 0.3px;
+		font-weight: normal;
+		text-align: center;
+		display: block;
+		top: 4px;
+		left: 4px;
+		text-transform: uppercase;
+		padding: 4px 4px 4px 16px;
+	}
+
+	.live-tag-large-thumb > i {
+		background-color: lime;
+		animation: flash 1.2s linear infinite;
+		border-radius: 50%;
+		position: absolute;
+		top: 5.5px;
+		left: 3px;
+		width: 10px;
+		height: 10px;
+	}	
+
+	@keyframes flash {
+		50% { opacity: 0.0; }
+	}
+
+	.collapsable-section {
+		background: #000000;
+		position: relative;
+	}
+
+	.collapsable-section-content {
+		width: 100%;
+		height: 222px;
+		background: #000000;
+		display: flex;
+		justify-content: space-around;
+	}
+
+	.collapsable-section-content > div.performer-thumbs-circular-large  {
+	    width: 50%;
+	    position: relative;
+	    display: flex;
+	    align-items: center;
+	    justify-content: space-around;
+	}
+
+	.collapsable-section-content > div.performer-thumbs-circular-large > .thumb-container  {
+		position: absolute;
+	    display: flex;
+	    height: 100%;
+	    width: 94%;
+	    flex-direction: column;
+	    justify-content: center;
+	    min-height: 170px;
+	}
+
+	.collapsable-section-content > div.performer-thumbs-circular-large > .thumb-container > .large-thumb  {
+	    background-repeat: no-repeat;
+	    background-position: center top;
+	    background-size: cover;
+	    border-radius: 50%;
+	    border: 2px solid;
+	    padding: 80px;
+	    margin: 0 auto;
+	    margin-bottom: 10px;
+	    border-color: #000000;
+	    box-shadow: 0 0 0 2px #ec1c24;
+	}
+
+	.collapsable-section-content .thumb-perf-name {
+		position: relative;
+		top: 40%;
+		color: #FFFFFF;
+		text-align: center;
+		width: 100%;
+	}
+
+	.browse-all-cams-section {
+		margin-top: 15px;
+		margin-bottom: 15px;
+		height: 80px;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		position: relative;
+	}
+
+	.footer-cta {
+		display: block;
+		text-align: center;
+		min-width: 200px;
+		color: #FFF;
+		font-size: 24px;
+		line-height: 40px;
+		text-transform: uppercase;
+		position: relative;
+		margin: 0 auto;
+		background: rgb(236,45,55);
+		font-family: Arial, sans-serif;
+		border-radius: 6px;
+	    font-weight: 600;
+	    padding-left: 25px;
+	    padding-right: 25px;
+	    padding-top: 5px;
+	    padding-bottom: 5px;
+	    white-space: nowrap;
+	    box-shadow: 2px 8px 15px rgba(0, 0, 0, 0.5);
+		background: #ec1c24;
+	}
+
+	.mobile-teaser {
+		display: block;
+	}
+
+	.desktop-teaser {
+		display: none;
+		background-color: #e0e0e0;
+		max-width: 970px;
+		margin: 2rem auto 5rem;
+	}
+
+	.teaser-content {
+		padding: 7px 20px 34px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.teaser-content h1 {
+		margin: 0 0 6px;
+		font-size: 60px;
+		letter-spacing: -1px;
+		text-align: center;
+		color: #000;
+	}
+
+	.teaser-content h3 {
+		font-size: 39px;
+		font-weight: bold;
+		letter-spacing: -0.54px;
+		text-align: center;
+		color: #000;
+	}
+
+	.teaser-content h4 {
+		margin: 6px 10px 3px;
+		font-size: 30px;
+		font-weight: bold;
+		letter-spacing: -0.42px;
+		text-align: center;
+		color: #5c5c5c;
+	}
+
+	.teaser-content h5 {
+		margin: 33px 49px 8px;
+		font-size: 26px;
+		font-weight: bold;
+		letter-spacing: -0.36px;
+		text-align: center;
+		color: #5c5c5c;
+	}
+
+	.teaser-content .teaser-join {
+		width: 508px;
+		height: 94px;
+		margin: auto;
+		display: inline-block;
+		border-radius: 12px;
+		background-color: #e02020;
+		width: 392px;
+		font-size: 81px;
+		font-weight: 900;
+		text-align: center;
+		color: #fff;
+		padding: 0 54px;
+	}
+
+	.teaser-video-container {
+		display: inline-flex;
+		position: relative;
+	}
+
+	.teaser-video-container .live-tag {
+		width: 208px;
+		height: 48px;
+		padding: 3px 11px 3px 12px;
+		border-radius: 4px;
+		background-color: rgba(0, 0, 0, 0.39);
+		top: 16px;
+		left: 13px;
+		font-size: 36px;
+		font-weight: 900;
+		display: flex;
+    justify-content: space-between;
+    align-items: center; 
+	}
+
+	.teaser-content .live-tag {
+		top: 25px;
+	}
+
+	.teaser-video-container .live-tag i {
+		position: relative;
+    height: 15px;
+    width: 15px;
+    top: 0;
+	}
+
+	.teaser-video-text {
+		position: absolute;
+    width: 100%;
+    margin-top: 40%;
+    text-align: center;
+    font-size: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+	}
+
+	.teaser-video-text .material-icons-outlined {
+		font-size: 150px;
+	}
+
+	.teaser-video-text h1 {
+		font-size: 48px;
+	}
+
+	.teaser-video-container h1 {
+		display: inline-flex;
+	}
+
+	.teaser-body {
+		margin: 3px 18px 20px;
+		font-size: 24px;
+		letter-spacing: -0.33px;
+		text-align: center;
+		color: #5c5c5c;
+	}
+
+	.teaser-content .nav-style-performer-list {
+		width: 400px;
+		height: 149px;
+    margin: auto;
+    background: none;
+	}
+
+	.teaser-content .nav-style-performer-list > a.performer-thumbs-circular-small > .thumb-container {
+		height: 165px;
+    width: 85px;
+	}
+
+	/*Video heights*/
+	.larger-75 {
+		min-height: 414px!important;
+	}
+
+	.larger-50 {
+		min-height: 340px!important;
+	}
+
+	.larger-75-smaller {
+		min-height: 295px!important;
+	}
+
+	.larger-50-smaller {
+		min-height: 245px!important;
+	}
+
+	/*Border Colors*/
+	.old-style-baseline-border {
+		animation: none;
+		background: #ec1c24;
+	}
+
+	.portrait-border {
+		box-shadow: 0 0 0 1px black;
+		border: 0;
+	}
+
+	/*Footer*/
+	footer {
+		z-index: 999;
+	}
+
+	/*Specific effects*/
+	.hide {
+		display: none;
+	}
+
+	.capitalize {
+		text-transform: capitalize;
+	}
+
+	.no-set-height {
+		max-height: none;
+	}
+
+	/*Media Queries*/
+	@media only screen and (max-width: 400px) {
+		.large-thumb {
+			padding: 70px!important;
+		}
+	}
+
+	@media only screen and (max-width: 395px) {
+		.border-large { 
+			width: 125px;
+			height: 125px;
+		}
+		.collapsable-section-content {
+		    height: 160px;
+		}
+	}
+
+	@media only screen and (max-width: 374px) {
+		.small-thumb  {
+			padding: 24px!important;
+		}
+	}
+
+	@media only screen and (max-width: 360px) {
+		.header-cta {
+			font-size: 24px;
+			line-height: 40px;
+		}
+	}
+
+	@media only screen and (max-width: 310px) {
+		.header-cta {
+			font-size: 22px!important;
+		}
+		.footer-cta {
+			font-size: 18px!important;
+		}
+	}
+
+	@media only screen and (max-width: 340px) {
+		.nav-style-performer-list a:last-child {
+			display: none;
+		}
+	}	
+
+	/* Smaller than iPhone 5*/
+	@media only screen and (max-width: 320px) {
+		.thumb-perf-name-smaller {
+		    font-size: 10px;
+		    width: 40px;
+		}
+		.large-thumb {
+			padding: 50px!important;
+		}
+		.small-thumb {
+			padding: 20px!important;
+		}
+
+		.larger-75 {
+			min-height: 340px!important;
+		}
+
+		.larger-50 {
+			min-height: 300px!important;
+		}
+
+		.larger-75-smaller {
+			min-height: 230px!important;
+		}
+
+		.larger-50-smaller {
+			min-height: 200px!important;
+		}		
+	}
+
+	@media only screen and (min-width: 970px) {
+		body {
+			background: white;
+		}
+
+		.desktop-teaser {
+			display: flex;
+		}
+
+		.mobile-teaser {
+			display: none;
+		}
+
+		footer {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+		}
+
+		#joinModal {
+			display: none !important;
+		}
+	}
+
+	.join-clicks-overlay {
+		position: fixed;
+		top: 50px;
+		bottom: 30px;
+		width: 100%;
+		z-index: 999;
+	}
+
+	.join-modal,
+	.close-button {
+		border: none;
+		padding: 0;
+	}
+
+	.join-button-container,
+	.footer-divider {
+		display: none !important;
+	}
+
+</style>     
+</head>
+<body>
+
+		
+
+	
+
+
+
+<nav>
+	<a href="https://livehdcams.com/signup/register?up=none&AFNO=1-41688-188&stno=2-2217-0-10817-0-0-3656-6317" class="nav-logo afno_nav-logo">
+		<img src="https://cdn.nsimg.net/3.0/auto/skin/18197/assets/e7ee8-1608676457-5fe27469365db.png" />
+	</a>
+	<a onclick="openJoinModal()" class="join-free-button">
+		JOIN FREE
+	</a>
+	<a href="https://livehdcams.com/login.php/?AFNO=1-41688-188&stno=2-2217-0-10817-0-0-3656-6317" class="nav-login-btn afno_nav-login">Log In</a>	
+</nav>
+
+<a onclick="openJoinModal()" class="join-clicks-overlay"></a>
+
+<section class="desktop-teaser">
+	<a class="teaser-video-container" onclick="openJoinModal()">
+		<div class="live-tag"><i aria-hidden='true'></i><span> live cam </span></div>
+		<div class="teaser-video-text">
+			<i class="material-icons-outlined">lock</i>
+			<h1>18+</h1>
+			<h2>Unlock For Free!</h2>
+		</div>
+		<video autoplay muted loop playsinline>
+				<source id="header-src" src="https://cdn.nsimg.net/cache/landing/blurred/20250317/BLUR_desktop.mp4" type="video/mp4">
+				<p class="center">Your browser does not support video</p>
+		</video>
+	</a>
+	<div class="teaser-content">
+		<h1>LIVE CAM CHAT</h1>
+		<h4>Discover, Chat, Connect</h4>
+		<div class="teaser-body">
+			Join our vibrant, free live cam community, buzzing 24/7 with welcoming faces from every corner of the globe. There's always someone waiting to chat.
+		</div>
+		<h4>An unforgettable connection awaits...</h4>
+		<section class="nav-style-performer-list">
+			
+				<a class="performer-thumbs-circular-small" onclick="openJoinModal()">
+					<div class="thumb-container">
+						<div class='live-tag hide notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+						<div class='border'>
+							<div class='performer'>
+								<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_01.png" />
+							</div>
+						</div>
+						<span class="thumb-perf-name-smaller">
+						</span>
+					</div>
+				</a>
+			
+				<a class="performer-thumbs-circular-small" onclick="openJoinModal()">
+					<div class="thumb-container">
+						<div class='live-tag hide notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+						<div class='border'>
+							<div class='performer'>
+								<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_02.png" />
+							</div>
+						</div>
+						<span class="thumb-perf-name-smaller">
+						</span>
+					</div>
+				</a>
+			
+				<a class="performer-thumbs-circular-small" onclick="openJoinModal()">
+					<div class="thumb-container">
+						<div class='live-tag hide notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+						<div class='border'>
+							<div class='performer'>
+								<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_03.png" />
+							</div>
+						</div>
+						<span class="thumb-perf-name-smaller">
+						</span>
+					</div>
+				</a>
+			
+		</section>
+		<h3>GET STARTED TODAY</h3>
+		<a class="teaser-join" onclick="openJoinModal()">JOIN FREE</a>
+	</div>
+</section>
+
+<div class="mobile-teaser">
+
+	<section class="nav-style-performer-list">
+		
+			<a class="performer-thumbs-circular-small" onclick="openJoinModal()">
+				<div class="thumb-container">
+					<div class='live-tag hide notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+					<div class='border'>
+						<div class='performer'>
+							<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_01.png" />
+						</div>
+					</div>
+					<span class="thumb-perf-name-smaller">
+					</span>
+				</div>
+			</a>
+		
+			<a class="performer-thumbs-circular-small" onclick="openJoinModal()">
+				<div class="thumb-container">
+					<div class='live-tag hide notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+					<div class='border'>
+						<div class='performer'>
+							<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_02.png" />
+						</div>
+					</div>
+					<span class="thumb-perf-name-smaller">
+					</span>
+				</div>
+			</a>
+		
+			<a class="performer-thumbs-circular-small" onclick="openJoinModal()">
+				<div class="thumb-container">
+					<div class='live-tag hide notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+					<div class='border'>
+						<div class='performer'>
+							<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_03.png" />
+						</div>
+					</div>
+					<span class="thumb-perf-name-smaller">
+					</span>
+				</div>
+			</a>
+		
+			<a class="performer-thumbs-circular-small" onclick="openJoinModal()">
+				<div class="thumb-container">
+					<div class='live-tag hide notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+					<div class='border'>
+						<div class='performer'>
+							<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_04.png" />
+						</div>
+					</div>
+					<span class="thumb-perf-name-smaller">
+					</span>
+				</div>
+			</a>
+		
+	</section>
+
+	<header class="canned-content hide">
+		<a onclick="openJoinModal()"></a>
+
+		<div class="mute-icon" data-vid="header">
+		</div>
+
+		<span class="header-cta notranslate">
+			<span class="darker-gradient-container">
+				<span class="enter-cams">Enter Cams</span><span class="join-free hide">Join Free</span>
+				<span class="darker-gradient"></span>
+			</span>
+		</span>
+		
+		<video id="header" class="header-video" autoplay muted loop playsinline>
+					<source id="header-src" src="https://cdn.nsimg.net/cache/landing/blurred/20250317/BLUR.mp4" type="video/mp4">
+					<p class="center">Your browser does not support video</p>
+			</video>
+	</header>
+
+	<main>
+
+		<section class="live-thumbs">
+			
+			<a class="performer-thumbs" onclick="openJoinModal()">
+				<div class='live-tag-large-thumb notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+				<span class="thumb-perf-age-co">
+					<span data-name="" class="thumb-perf-name notranslate">
+						HotHannah
+					</span>
+				</span>
+				<span class="thumb-info">
+					<span class="thumb-age" data-age="">18</span>
+				</span>
+				<span class="thumb-scrim"></span>
+				<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_05.png" />
+			</a>
+				
+			<a class="performer-thumbs" onclick="openJoinModal()">
+				<div class='live-tag-large-thumb notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+				<span class="thumb-perf-age-co">
+					<span data-name="" class="thumb-perf-name notranslate">
+						AshleeeX
+					</span>
+				</span>
+				<span class="thumb-info">
+					<span class="thumb-age" data-age="">19</span>
+				</span>
+				<span class="thumb-scrim"></span>
+				<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_06.png" />
+			</a>
+				
+			<a class="performer-thumbs" onclick="openJoinModal()">
+				<div class='live-tag-large-thumb notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+				<span class="thumb-perf-age-co">
+					<span data-name="" class="thumb-perf-name notranslate">
+						Silvera
+					</span>
+				</span>
+				<span class="thumb-info">
+					<span class="thumb-age" data-age="">40</span>
+				</span>
+				<span class="thumb-scrim"></span>
+				<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_07.png" />
+			</a>
+				
+			<a class="performer-thumbs" onclick="openJoinModal()">
+				<div class='live-tag-large-thumb notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+				<span class="thumb-perf-age-co">
+					<span data-name="" class="thumb-perf-name notranslate">
+						TheOnlyGoddess
+					</span>
+				</span>
+				<span class="thumb-info">
+					<span class="thumb-age" data-age="">35</span>
+				</span>
+				<span class="thumb-scrim"></span>
+				<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_08.png" />
+			</a>
+				
+		</section>
+
+		<section class="collapsable-section">
+			<a class="overlay" onclick="openJoinModal()">
+				<div class="collapsable-section-content">
+					
+						<div class="performer-thumbs-circular-large">
+							<a class="thumb-container" onclick="openJoinModal()">
+								<div class='border-large'>
+									<div class='live-tag-large hide notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+									<div class='performer-large'>
+										<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_09.png" />
+									</div>
+								</div>
+								<span class="thumb-perf-name">
+									SAKURA
+								</span>
+							</a>
+						</div>
+					
+						<div class="performer-thumbs-circular-large">
+							<a class="thumb-container" onclick="openJoinModal()">
+								<div class='border-large'>
+									<div class='live-tag-large hide notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+									<div class='performer-large'>
+										<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_10.png" />
+									</div>
+								</div>
+								<span class="thumb-perf-name">
+									little_lucy
+								</span>
+							</a>
+						</div>
+					
+				</div>
+			</a>
+		</section>
+
+		<section class="live-thumbs">
+			
+			<a class="performer-thumbs" onclick="openJoinModal()">
+				<div class='live-tag-large-thumb notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+				<span class="thumb-perf-age-co">
+					<span data-name="" class="thumb-perf-name notranslate">
+						Pandah
+					</span>
+				</span>
+				<span class="thumb-info">
+					<span class="thumb-age" data-age="">20</span>
+				</span>
+				<span class="thumb-scrim"></span>
+				<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_11.png" />
+			</a>
+				
+			<a class="performer-thumbs" onclick="openJoinModal()">
+				<div class='live-tag-large-thumb notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+				<span class="thumb-perf-age-co">
+					<span data-name="" class="thumb-perf-name notranslate">
+						PerfectPaisley
+					</span>
+				</span>
+				<span class="thumb-info">
+					<span class="thumb-age" data-age="">45</span>
+				</span>
+				<span class="thumb-scrim"></span>
+				<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_12.png" />
+			</a>
+				
+			<a class="performer-thumbs" onclick="openJoinModal()">
+				<div class='live-tag-large-thumb notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+				<span class="thumb-perf-age-co">
+					<span data-name="" class="thumb-perf-name notranslate">
+						xJudithx
+					</span>
+				</span>
+				<span class="thumb-info">
+					<span class="thumb-age" data-age="">27</span>
+				</span>
+				<span class="thumb-scrim"></span>
+				<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_13.png" />
+			</a>
+				
+			<a class="performer-thumbs" onclick="openJoinModal()">
+				<div class='live-tag-large-thumb notranslate'><span> live chat </span><i aria-hidden='true'></i></div>
+				<span class="thumb-perf-age-co">
+					<span data-name="" class="thumb-perf-name notranslate">
+						AllyYours
+					</span>
+				</span>
+				<span class="thumb-info">
+					<span class="thumb-age" data-age="">21</span>
+				</span>
+				<span class="thumb-scrim"></span>
+				<img src="https://cdn.nsimg.net/cache/landing/blurred/20250317/blur_14.png" />
+			</a>
+				
+		</section>
+
+		<section class="browse-all-cams-section">
+			<a class="overlay" onclick="openJoinModal()" style="z-index: 3"></a>
+			<div class="footer-cta notranslate darker-gradient-container-footer">
+				Browse All Cams
+				<span class="darker-gradient-footer"></span>
+			</div>
+		</section>
+
+	</main>
+
+</div>
+
+
+<style>
+  #joinModal {
+  display: none;
+}
+
+.join-modal {
+  position: fixed;
+  z-index: 999;
+  top: 50svh;
+  left: 50svw;
+  background: rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%);
+  display: flex;
+  color: rgb(28, 28, 30);
+  gap: 14px;
+  width: 80%;
+  background: #E5E5EA;
+  align-items: center;
+  padding-top: 16px;
+  border-radius: 8px;
+  flex-direction: column;
+  padding-top: 45px;
+  padding-bottom: 32px;
+  z-index: 999;
+  padding-left: 24px;
+  padding-right: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (min-width: 500px) {
+  .join-modal {
+    width: 380px;
+  }
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0);
+  z-index: 998;
+  pointer-events: all;
+}
+
+.lets-go-button-container {
+  display: block;
+  width: 100%;
+}
+
+.lets-go-button {
+  background: linear-gradient(rgb(253, 232, 61), rgb(241, 149, 2));
+  color: rgb(33, 33, 33);
+  font-size: 20px;
+  font-weight: 700;
+  flex-grow: 2;
+  height: 48px;
+  min-width: 100%;
+  border: medium;
+  cursor: pointer;
+  display: inline-flex;
+  padding: 0px 4px;
+  position: relative;
+  box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 4px 0px;
+  transition: background 250ms ease-in-out 0s;
+  align-items: center;
+  border-radius: 2px;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.close-button {
+  display: flex;
+  align-items: end;
+  justify-content: right;
+  cursor: pointer;
+  /* width: 100%; */
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  top: 10px;
+  right: 10px;
+}
+
+.close-icon {
+  color: black;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.join-modal .close span {
+  font-weight: 200;
+  font-size: 10px;
+}
+
+.join-modal .close span,
+.join-modal .close i {
+  display: inline;
+  padding-right: 8px;
+  line-height: 18px;
+  color: white;
+}
+
+.join-modal .close .fa {
+  font-size: 16px;
+  position: relative;
+  padding-left: 4px;
+}
+
+.join-modal-anchor {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.join-modal-heading {
+  text-align: center;
+  font-size: 22px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.join-modal-subheading {
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.redirect-button {
+  border-width: 2px;
+  border-radius: 4px;
+  background-size: 40px;
+  height: 40px;
+  width: 100%;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: 500;
+  border: 1px solid rgb(199, 199, 204);
+  background-color: #fff;
+  color: #212121;
+  cursor: pointer;
+}
+
+.or-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #636366;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.or-divider {
+  margin-inline-start: 16px;
+  margin-inline-end: 16px;
+  height: 1px;
+  background: #636366;
+  opacity: 0.25;
+  width: 120px;
+  display: inline;
+}
+
+.oauth-button {
+  background-repeat: no-repeat;
+  position: relative;
+  letter-spacing: 0.25px;
+}
+
+.white-box {
+  position: absolute;
+  width: 40px;
+  height: 90%;
+  background-color: white;
+  left: 2px;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(0.99);
+}
+
+.google-logo-container {
+  display: flex;
+  align-items: center;
+  height: 80%;
+  width: 80%;
+  position: absolute;
+}
+
+.google-logo {
+  width: 100%;
+  transform: scale(1.35);
+  transform-origin: center;
+}
+
+.email-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  letter-spacing: 0.5px;
+}
+
+.login-section {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  width: 100%;
+  gap: 5px;
+}
+
+.login-button {
+  height: 32px;
+  border: 1px solid rgb(174, 174, 178);
+  background-color: transparent;
+  color: #1C1C1C;
+}
+ .categoryBtn:first-of-type {
+    background: #ec1c24;
+  }
+</style>
+
+<div class="modal-overlay"></div>
+
+
+
+
+<dialog id="joinModal" class="join-modal">
+  <button class="close-button" onclick="document.getElementById('joinModal').close()">
+    <i class="close-icon material-icons">close</i>
+  </button>
+
+  <h1 class="join-modal-heading">Create Free Account</h1>
+  <p class="join-modal-subheading">Safe, Secure &amp; Private</p>
+
+  <a class="redirect-button oauth-button" onclick="navigateToOauth({ referrerId: '14106', siteId: '10336' })">
+    <span class="white-box">
+      <span class="google-logo-container">
+        <img class="google-logo" src="https://cdn.nsimg.net/cache/landing/join/20240328/google-oauth-logo.svg"/>
+      </span>
+    </span>
+    <span>Continue with Google</span>
+  </a>
+
+  <div class="or-section">
+    <span class="or-divider"></span>
+    <span>or</span>
+    <span class="or-divider"></span>
+  </div>
+
+  <a class="redirect-button email-button" onclick="navigateToSignup('&fromJoinModal=true')">
+    Continue with Email
+  </a>
+
+  <div class="login-section">
+    <span>Already a member?&nbsp;</span>
+    <a class="redirect-button login-button" href="https://livehdcams.com/login-pop/?AFNO=1-41688-188&stno=2-2217-0-10817-0-0-3656-6317" target="_self">Log In</a>
+  </div>
+
+</dialog>
+
+<script>
+  const modal = document.getElementById('joinModal');
+const modalOverlay = document.querySelector(".modal-overlay");
+
+function openJoinModal() {
+  modal.style.display = "flex";
+  modalOverlay.style.display = "block";
+  modalShown = true;
+  localStorage.setItem('modalShown', true);
+}
+
+function closeJoinModal() {
+  modal.style.display = "none";
+  modalOverlay.style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  const TIME_BEFORE_SHOWING_MODAL = 7000;
+  const hasModalBeenPreviouslyShown = localStorage.getItem('modalShown');
+
+  function showModalAfterDelay() {
+    if (hasModalBeenPreviouslyShown) {
+      return;
+    }
+
+    setTimeout(() => {
+      const hasModalBeenPreviouslyShown = localStorage.getItem('modalShown');
+      if (!hasModalBeenPreviouslyShown) {
+        openJoinModal();
+      }
+    }, TIME_BEFORE_SHOWING_MODAL);
+  }
+
+  function hideModal() {
+    modal.style.display = "none";
+    modalOverlay.style.display = "none";
+  }
+
+  document.querySelector('.close-button').addEventListener('click', hideModal);
+
+  showModalAfterDelay()
+
+  modalOverlay.addEventListener('click', function () {
+    hideModal();
+  });
+});
+
+  /**
+ * Import and use this in landers that rely on oauth
+ * AFNO & stno will be passed thru
+ */
+function navigateToOauth({ referrerId, siteId }) {
+  let genderPrefs = JSON.parse(localStorage.getItem("genderPreferences"));
+  let genderString = "girls";
+  const KWIKYLIVE_SITEID = "11638";
+  const activeTab = document.querySelector('.nav-tab-button.active-gender'); // NOTE: see gendersAndSearch
+
+  if (activeTab) {
+    const activeGender = activeTab.dataset.gender;
+    
+    genderString = activeGender.toLowerCase();
+  } else if (genderPrefs) {
+    if (Object.values(genderPrefs).filter(v => !!v).length > 1) {
+      genderString = "none";
+    } else if (genderPrefs["f"]) {
+      genderString = "girls";
+    } else if (genderPrefs["m"]) {
+      genderString = "guys";
+    } else if (genderPrefs["t"]) {
+      genderString = "trans";
+    } 
+  }
+
+  let baseUrlString = `https://authentication.naiadsystems.com/v3/oauth/context?smidp=google&siteId=${siteId}&referrerId=${referrerId}&returnPath=/&up=${genderString}`;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const AFNO = urlParams.get('AFNO');
+  const stno = urlParams.get('stno');
+
+  if (AFNO) {
+    baseUrlString += `&AFNO=${AFNO}`;
+  }
+
+  if (stno) {
+    baseUrlString += `&stno=${stno}`;
+  }
+
+  if (siteId.toString() === KWIKYLIVE_SITEID) {
+    baseUrlString += `&freemium=false`;
+  }
+
+  const formattedUrl = new URL(baseUrlString);
+  window.location.href = formattedUrl.href;
+}
+
+  /**
+ * Import and use this in landers where clicks to signup should carry over
+ * the user's selected gender when navigating to the product
+ */
+function navigateToSignup(additionalParams) {
+  const baseUrlString = `https://livehdcams.com/signup/register/?AFNO=1-41688-188&stno=2-2217-0-10817-0-0-3656-6317`;
+  const baseUrl = new URL(baseUrlString);
+  const urlParams = new URLSearchParams(window.location.search);
+  let AFNO = urlParams.get('AFNO');
+  let stno = urlParams.get('stno');
+  const baseUrlHasStno = baseUrl.searchParams.has('stno');
+  let genderPrefs = JSON.parse(localStorage.getItem("genderPreferences"));
+
+  const activeTab = document.querySelector('.nav-tab-button.active-gender'); // NOTE: see gendersAndSearch
+  let genderString = "girls";
+
+  if (activeTab) {
+    const activeGender = activeTab.dataset.gender;
+    
+    genderString = activeGender.toLowerCase();
+  } else if (genderPrefs) {
+    if (Object.values(genderPrefs).filter(v => !!v).length > 1) {
+      genderString = "none";
+    } else if (genderPrefs["f"]) {
+      genderString = "girls";
+    } else if (genderPrefs["m"]) {
+      genderString = "guys";
+    } else if (genderPrefs["t"]) {
+      genderString = "trans";
+    }
+  }
+
+  formattedUrl = `${baseUrl}${AFNO ? "&" : "?"}up=${genderString}`;
+  formattedUrl += additionalParams || "";
+
+  if (!baseUrlHasStno && stno) {
+    formattedUrl += `&stno=${stno}`;
+  }
+
+  if (this.categoryCode) {
+    formattedUrl += `&smc=${this.categoryCode}`;
+  }
+
+  window.location.href = formattedUrl;
+}
+
+</script>
+
+
+
+<style>
+  .footer {
+  background: #000;
+  /* margin-top: 20px; */
+  padding: 24px 16px 16px;
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+}
+
+.join-button {
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  color: #000;
+  font-weight: 400;
+  line-height: 40px;
+  background-image: linear-gradient(-180deg, #fbe014 0%, #cd7e00 100%);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  border-radius: 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 15px;
+  height: 32px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  min-width: 100%;
+  justify-content: center;
+  height: 40px;
+}
+
+.join-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.footer-divider {
+  border-width: 0px 0px 1px;
+  border-top-style: initial;
+  border-right-style: initial;
+  border-left-style: initial;
+  border-top-color: initial;
+  border-right-color: initial;
+  border-left-color: initial;
+  border-image: initial;
+  margin: 0px;
+  border-bottom-style: solid;
+  border-bottom-color: rgb(72, 72, 74);
+  width: 100%;
+}
+
+.legal-text {
+  font-size: 11px;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  row-gap: 6px;
+}
+
+.disclaimer-text {
+  color: #8E8E93;
+}
+
+.compliance-text-link {
+  color: #AEAEB2;
+}
+
+.footer-extras {
+  font-size: 11px;
+  color: #AEAEB2;
+  display: flex;
+  gap: 5px;
+}
+
+.footer-extras-link {
+  color: #AEAEB2;
+}
+
+.copyright-text {
+  color: #8E8E93;
+  font-size: 11px;
+}
+</style>
+
+<footer class="footer">
+  <div class="join-button-container">
+    <button class="join-button" onclick="openJoinModal()">Join Free</button>
+  </div>
+
+  <hr class="footer-divider"></hr>
+
+  <div class="legal-text">
+    <p class="disclaimer-text">All models appearing on this website are 18 years or older.</p>
+
+    <a class="compliance-text-link" href="https://icflegal.com/cam?site=livehdcams.com#record-keeping-2257">
+      18 U.S.C. 2257 and 2257A Record-Keeping Requirements Compliance Statement
+    </a>
+  </div>
+
+  <div class="footer-extras">
+    <a
+      class="footer-extras-link"
+      href="https://icflegal.com/cam?site=livehdcams.com"
+    >
+      Legal
+    </a>
+    <span>|</span>
+    <a
+      class="footer-extras-link"
+      href="https://icflegal.com/cam?site=livehdcams.com#terms-and-conditions"
+    >
+      Terms &amp; Conditions
+    </a>
+    <span>|</span>
+    <a
+      class="footer-extras-link"
+      href="https://icflegal.com/cam?site=livehdcams.com#privacy-policy"
+    >
+      Privacy Policy
+    </a>
+  </div>
+
+  <p class="copyright-text">2003 - 2026 livehdcams.com. All rights reserved.</p>
+
+</footer>
+
+	
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<script type="text/javascript">
+// Mobile menu or the mobile menu
+$(".search-btn").click(function () {
+	$(".search-box").slideToggle(50, function() {});
+});
+// end of jquery
+
+window.addEventListener('DOMContentLoaded', () => {
+	// Volume control
+	document.querySelector('.mute-icon').addEventListener('click', function(e) {
+		e.preventDefault();
+		
+		if (document.getElementById('header').muted === true) {
+			document.getElementById('header').muted = false;
+			document.querySelector('.vol-off').classList.toggle('hide');
+			document.querySelector('.vol-on').classList.toggle('hide');
+		} else {
+			document.getElementById('header').muted = true;
+			document.querySelector('.vol-off').classList.toggle('hide');
+			document.querySelector('.vol-on').classList.toggle('hide');    
+		}
+	});
+
+	// Get piece of url
+	const params = new URLSearchParams(document.location.search);
+	// Get param "v"
+	const designVersion = params.get('v');
+
+	// If it does not exist, show the "Old style" baseline
+	if (!designVersion) {
+
+		for (var a = 0; a < document.querySelectorAll('.border').length; ++a) {
+		   document.querySelectorAll('.border')[a].classList.add('old-style-baseline-border');
+		}
+
+		for (var b = 0; b < document.querySelectorAll('.border-large').length; ++b) {
+		   document.querySelectorAll('.border-large')[b].classList.add('old-style-baseline-border');
+		}
+
+		for (var c = 0; c < document.querySelectorAll('.performer').length; ++c) {
+		   document.querySelectorAll('.performer')[c].classList.add('portrait-border');
+		}
+
+		for (var d = 0; d < document.querySelectorAll('.performer-large').length; ++d) {
+		   document.querySelectorAll('.performer-large')[d].classList.add('portrait-border');
+		}
+
+	} else if (designVersion === 'old-style-with-canned-header') {
+
+		for (var a = 0; a < document.querySelectorAll('.border').length; ++a) {
+		   document.querySelectorAll('.border')[a].classList.add('old-style-baseline-border');
+		}
+
+		for (var b = 0; b < document.querySelectorAll('.border-large').length; ++b) {
+		   document.querySelectorAll('.border-large')[b].classList.add('old-style-baseline-border');
+		}
+
+		for (var c = 0; c < document.querySelectorAll('.performer').length; ++c) {
+		   document.querySelectorAll('.performer')[c].classList.add('portrait-border');
+		}
+
+		for (var d = 0; d < document.querySelectorAll('.performer-large').length; ++d) {
+		   document.querySelectorAll('.performer-large')[d].classList.add('portrait-border');
+		}
+
+		// Show the video header
+	 	document.querySelector('.canned-content').classList.remove('hide');
+ 
+	} else if (designVersion === '2columngradient') {
+
+		// Show live tags on circular thumbs
+		for (var a = 0; a < document.querySelectorAll('.live-tag').length; ++a) {
+		   document.querySelectorAll('.live-tag')[a].classList.remove('hide');
+		}
+
+		// Show live tags on larger circular thumbs
+		for (var b = 0; b < document.querySelectorAll('.live-tag-large').length; ++b) {
+		   document.querySelectorAll('.live-tag-large')[b].classList.remove('hide');
+		}
+
+	} else if (designVersion === 'new-style-with-canned-header') {
+
+		// Show live tags on circular thumbs
+		for (var a = 0; a < document.querySelectorAll('.live-tag').length; ++a) {
+		   document.querySelectorAll('.live-tag')[a].classList.remove('hide');
+		}
+
+		for (var b = 0; b < document.querySelectorAll('.live-tag-large').length; ++b) {
+		   document.querySelectorAll('.live-tag-large')[b].classList.remove('hide');
+		}
+
+		// Show the video header
+	 	document.querySelector('.canned-content').classList.remove('hide');
+	}
+
+	const geoSuggest = params.get('geoSuggest');
+
+	if (geoSuggest === 'yes') {
+		document.querySelector('.browse-more-cams-top').classList.remove('hide');
+	}
+
+	// Add target self to all links
+	document.querySelectorAll('a').forEach(function(element) {
+		element.setAttribute('target', '_self');
+	});
+
+});
+
+</script>
+
+
+ 
+
+
+
+
+</body>
+</html>

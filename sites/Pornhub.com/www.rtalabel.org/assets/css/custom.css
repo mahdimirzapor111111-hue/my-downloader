@@ -1,0 +1,307 @@
+body {
+  font-family: 'Muli', sans-serif; }
+
+.container {
+  max-width: 1480px; }
+
+.container-background {
+  background-color: #1c6ab4;
+  color: #fff;
+  overflow: hidden; }
+  .container-background a {
+    color: #fff; }
+
+.header {
+  padding-top: 10px; }
+
+.header-social {
+  position: relative;
+  margin-top: 20px; }
+  .header-social .donate {
+    background: #3f9244; 
+    text-align: left;
+    padding: 10px 15px;
+    display: block;
+    line-height: 22px; }
+    .header-social .donate:hover {
+      text-decoration: none;
+      background: #47a44c;
+      font-weight: 700;
+      /* font-size: 16px;
+      text-transform: uppercase; */ }
+    .header-social .donate .second-line {
+      display: block;
+      font-size: 12px; }
+
+.main-menu {
+  margin-bottom: 15px; }
+  .main-menu a {
+    font-size: 18px; }
+
+.social-links {
+  text-align: center;
+  padding-right: 0; }
+  .social-links .social-item {
+    display: inline-block;
+    width: 35px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%); }
+
+.navbar {
+  padding-right: 0; }
+
+.navbar-dark .navbar-nav .nav-item.active .nav-link {
+  color: rgba(255, 255, 255, 0.75); }
+
+.navbar-dark .navbar-nav .nav-link {
+  color: #fff; }
+
+.banner {
+  background-image: url(../img/banner.png);
+  background-size: cover; }
+  .banner img {
+    width: 100%; }
+
+.info-section .info-item {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  color: #fff;
+  text-align: center;
+  line-height: 10px; }
+  .info-section .info-item h3 {
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0; }
+  .info-section .info-item a {
+    display: block;
+    font-size: 14px;
+    color: #fff; }
+  .info-section .info-item.info-report {
+    background: #f38c2e; }
+  .info-section .info-item.info-sponsorship {
+    background: #3f9244; }
+
+.section {
+  text-align: center;
+  padding: 25px 0; }
+  .section .heading {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px; }
+  .section .description {
+    text-align: left;
+    font-size: 14px; }
+
+.latest-news-section {
+  background: #1c6ab4;
+  color: #fff; }
+  .latest-news-section .items .item {
+    color: #fff;
+    display: block;
+    font-size: 14px; }
+    .latest-news-section .items .item .title {
+      font-weight: 700; }
+
+.protecting-children-section {
+  padding-bottom: 0; }
+  .protecting-children-section .heading {
+    color: #166fb3; }
+  .protecting-children-section .items .item {
+    margin-bottom: 30px; }
+    .protecting-children-section .items .item .image {
+      margin-bottom: 2px; }
+      .protecting-children-section .items .item .image img {
+        border-radius: 5px 5px 0 0;
+        width: 100%; }
+    .protecting-children-section .items .item .content-box {
+      border-radius: 0 0 5px 5px;
+      background: #166fb3;
+      padding: 15px 0;
+      color: #fff; }
+      .protecting-children-section .items .item .content-box .title {
+        font-size: 18px;
+        padding: 0 10px;
+        text-align: center;
+        font-weight: 700; }
+      .protecting-children-section .items .item .content-box .subtitle {
+        font-size: 14px;
+        display: block;
+        margin-top: 5px; }
+      .protecting-children-section .items .item .content-box .learn-more {
+        border-radius: 10px;
+        border: 1px solid #96e1ef;
+        font-size: 16px;
+        color: #fff;
+        font-weight: 700;
+        display: block;
+        width: 85%;
+        margin: 20px auto 10px;
+        padding: 5px 0; }
+        .protecting-children-section .items .item .content-box .learn-more:hover {
+          background: #197dca;
+          text-decoration: none; }
+
+.donation-link {
+  text-align: center; }
+  .donation-link .description {
+    font-size: 18px;
+    color: #77787b; }
+  .donation-link .headline {
+    font-weight: 700;
+    font-size: 21px;
+    color: #166fb3; }
+
+.our-mission-section {
+  padding-top: 0; }
+  .our-mission-section .heading {
+    color: #166fb3; }
+  .our-mission-section .description {
+    font-size: 14px;
+    color: #77787b;
+    text-align: left; }
+
+.why-asacp-section {
+  background: #f38c2e; }
+  .why-asacp-section .heading {
+    color: #fff; }
+  .why-asacp-section .description {
+    color: #fff; }
+    .why-asacp-section .description p {
+      line-height: 21px;
+      font-weight: 700; }
+
+.what-we-do-section .heading {
+  color: #166fb3; }
+
+.what-we-do-section .headline {
+  font-weight: 700;
+  font-size: 14px;
+  color: #77787b; }
+
+.what-we-do-section .description {
+  color: #77787b; }
+  .what-we-do-section .description ul {
+    margin: 0;
+    padding: 0; }
+
+.how-you-can-help-section .heading {
+  color: #166fb3; }
+
+.how-you-can-help-section .headline {
+  color: #77787b; 
+  font-weight: 700;
+  }
+  .how-you-can-help-section .headline a {
+    color: #166fb3; 
+    }
+
+.how-you-can-help-section .logo {
+  margin-top: 20px; }
+  .how-you-can-help-section .logo img {
+    margin: 0 30px; }
+
+.footer {
+  background: #77787b;
+  color: #fff;
+  padding: 40px 0; }
+  .footer .info {
+    font-size: 16px;
+    text-transform: uppercase;
+    text-align: center; }
+  .footer .group {
+    margin: 20px 0;
+    text-align: center; }
+  .footer .heading {
+    font-size: 18px;
+    text-transform: uppercase; }
+  .footer .description {
+    font-size: 16px; }
+
+@media (min-width: 992px) {
+  .navbar .nav-item:last-child .nav-link:after {
+    display: none; }
+  .navbar .nav-item .nav-link {
+    position: relative; }
+    .navbar .nav-item .nav-link:after {
+      content: "";
+      top: 55%;
+      border-right: 1px solid #fff;
+      position: absolute;
+      width: 1px;
+      height: 40%;
+      transform: translateY(-50%);
+      left: 100%; }
+  .footer .group {
+    margin: 70px 0;
+    text-align: left; }
+  .footer .info {
+    font-size: 18px; }
+  .footer .heading {
+    font-size: 32px; }
+  .footer .description {
+    font-size: 16px; }
+  .section {
+    padding: 40px 0; }
+    .section .heading {
+      font-size: 40px; }
+    .section .description {
+      font-size: 21px;
+      padding: 0 150px; }
+  .what-we-do-section .headline {
+    font-size: 21px; }
+  .how-you-can-help-section .headline {
+    font-size: 21px; }
+  .how-you-can-help-section .logo {
+    margin-top: 100px; }
+  .protecting-children-section .items .item {
+    margin-bottom: 20px; }
+    .protecting-children-section .items .item .content-box .title {
+      font-size: 40px; }
+    .protecting-children-section .items .item .content-box .subtitle {
+      font-size: 21px; }
+    .protecting-children-section .items .item .content-box .learn-more {
+      font-size: 26px;
+      margin-top: 40px;
+      margin-bottom: 20px; }
+  .latest-news-section .items .item {
+    font-size: 26px; }
+  .info-section .info-item h3 {
+    font-size: 40px; }
+  .info-section .info-item a {
+    font-size: 20px; }
+  .header {
+    padding-top: 10px; }
+  .header-social {
+    margin-top: 0; }
+    .header-social .donate {
+      text-align: center;
+      bottom: 100%;
+      padding: 20px 30px;
+      left: 68%;
+      width: 200%; }
+      .header-social .donate .first-line {
+        font-size: 40px; }
+      .header-social .donate .second-line {
+        font-size: 20px; }
+  .social-links {
+    text-align: right;
+    padding-right: 10px; }
+    .social-links .social-item {
+      width: auto;
+      margin: 0 5px; }
+  .navbar {
+    padding-right: auto; }
+  .banner {
+    height: 466px; } }
+
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .header-social .donate .first-line {
+    font-size: 18px; }
+  .header-social .donate .second-line {
+    font-size: 16px; } 
+}
+
+/*# sourceMappingURL=custom.css.map */
+
