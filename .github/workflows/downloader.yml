@@ -1,108 +1,66 @@
-name: AVASAM - Download from URLs & Save to Repo
+name: AVASAM - Mirror Websites
 
 on:
   workflow_dispatch:
     inputs:
       urls:
-        description: 'Space-separated list of URLs to download'
+        description: 'Space-separated list of website URLs to mirror'
         required: true
         type: string
-      mode:
-        description: 'Download mode'
-        required: false
-        default: 'normal'
-        type: choice
-        options:
-          - normal
-          - zip
-      split_threshold_mb:
-        description: 'Split files larger than this MB (0 = never split)'
-        required: false
-        default: 90
-        type: number
 
 jobs:
-  save-file:
+  mirror-sites:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install aria2 and zip
+      - name: Install wget
         run: |
           sudo apt-get update
-          sudo apt-get install -y aria2 zip
+          sudo apt-get install -y wget
 
-      - name: AVASAM Downloader - https://avasam.ir
+      - name: AVASAM Website Mirror - https://avasam.ir
         run: |
-          echo "🏷️  AVASAM - Your Download Solution"
+          echo "🏷️  AVASAM - Website Mirror"
           echo "🌐 https://avasam.ir"
           echo ""
 
-      - name: Download files
+      - name: Mirror websites
         run: |
-          MODE="${{ github.event.inputs.mode }}"
           URLS="${{ github.event.inputs.urls }}"
-          SPLIT_THRESHOLD_MB="${{ github.event.inputs.split_threshold_mb }}"
-          SPLIT_THRESHOLD_BYTES=$(( SPLIT_THRESHOLD_MB * 1024 * 1024 ))
+          mkdir -p sites
 
-          echo "🏷️  AVASAM (https://avasam.ir) - Downloading with mode: $MODE"
-          echo "Split threshold: $SPLIT_THRESHOLD_MB MB"
-
-          mkdir -p downloads tmp_downloads
-
-          # Download each URL
           for URL in $URLS; do
-            FILENAME=$(basename "$URL")
-            echo "⬇️ Downloading $URL -> $FILENAME"
-            aria2c \
-              --split=2 \
-              --max-connection-per-server=2 \
-              --min-split-size=90M \
-              --dir="tmp_downloads" \
-              --out="$FILENAME" \
+            SAFE_NAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]/_/g')
+            TARGET_DIR="sites/${SAFE_NAME}"
+
+            echo "🕸 Mirroring $URL -> $TARGET_DIR"
+
+            wget \
+              --mirror \
+              --convert-links \
+              --adjust-extension \
+              --page-requisites \
+              --no-parent \
+              -P "$TARGET_DIR" \
               "$URL"
           done
 
-          # Zip all downloads if mode is 'zip'
-          if [ "$MODE" = "zip" ]; then
-            ARCHIVE_NAME="downloads/archive_$(date +%Y%m%d_%H%M%S).zip"
-            echo "📦 Creating zip archive: $ARCHIVE_NAME"
-            zip -j "$ARCHIVE_NAME" tmp_downloads/*
-            rm -rf tmp_downloads
-          else
-            # Normal mode: handle splitting large files
-            for FILE in tmp_downloads/*; do
-              [ -f "$FILE" ] || continue
-              SIZE=$(stat -c%s "$FILE")
-              BASENAME=$(basename "$FILE")
-
-              if [ "$SPLIT_THRESHOLD_BYTES" -gt 0 ] && [ "$SIZE" -gt "$SPLIT_THRESHOLD_BYTES" ]; then
-                echo "✂️ $BASENAME is $(( SIZE / 1024 / 1024 ))MB — splitting into ${SPLIT_THRESHOLD_MB}MB parts (zip-split)"
-                # Create a zip split into parts that can be reassembled with `zip -F`
-                zip -0 -s "${SPLIT_THRESHOLD_MB}m" "downloads/${BASENAME}.zip" -j "$FILE"
-                echo "✅ Parts: $(ls downloads/${BASENAME}.z* 2>/dev/null | wc -l)"
-              else
-                cp "$FILE" "downloads/$BASENAME"
-              fi
-            done
-            rm -rf tmp_downloads
-          fi
-
-      - name: Commit & Push in batches of 5 files (AVASAM)
+      - name: Commit & Push mirrored sites (AVASAM)
         run: |
           BRANCH="${GITHUB_REF_NAME}"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          echo "🏷️  AVASAM (https://avasam.ir) - Preparing to commit files"
+          echo "🏷️  AVASAM (https://avasam.ir) - Preparing to commit mirrored sites"
 
-          # Collect all new/modified files under downloads/
-          mapfile -t ALL_FILES < <(git ls-files --others --modified --exclude-standard downloads/)
+          mapfile -t ALL_FILES < <(git ls-files --others --modified --exclude-standard sites/)
 
           TOTAL=${#ALL_FILES[@]}
           echo "📦 Total files to push: $TOTAL"
@@ -112,23 +70,9 @@ jobs:
             exit 0
           fi
 
-          BATCH_SIZE=5
-          BATCH_NUM=0
+          git add "${ALL_FILES[@]}"
+          git commit -m "[AVASAM] Add mirrored websites [skip ci]"
+          git pull --rebase origin "$BRANCH"
+          git push origin HEAD:"$BRANCH"
 
-          for (( i=0; i<TOTAL; i+=BATCH_SIZE )); do
-            BATCH_NUM=$(( BATCH_NUM + 1 ))
-            BATCH=("${ALL_FILES[@]:i:BATCH_SIZE}")
-
-            echo "🚀 Pushing batch $BATCH_NUM: files $((i+1))–$(( i + ${#BATCH[@]} )) of $TOTAL"
-
-            git add "${BATCH[@]}"
-            git commit -m "[AVASAM] Add downloaded files — batch $BATCH_NUM [skip ci]"
-
-            # Pull with rebase before each push to avoid conflicts
-            git pull --rebase origin "$BRANCH"
-            git push origin HEAD:"$BRANCH"
-
-            echo "✅ Batch $BATCH_NUM pushed"
-          done
-
-          echo "🎉 All $TOTAL files pushed in $BATCH_NUM batch(es) — AVASAM (https://avasam.ir)"
+          echo "🎉 All $TOTAL mirrored files pushed — AVASAM (https://avasam.ir)"
