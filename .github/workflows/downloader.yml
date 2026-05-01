@@ -132,4 +132,3 @@ jobs:
           done
 
           echo "🎉 All $TOTAL files pushed in $BATCH_NUM batch(es) — AVASAM (https://avasam.ir)"
-می‌خواستم یک فریم ورک مثل همین بسازی که بتونه سایت رو به صورت html دانلود کنه و ذخیره کنه و فقد آدرس سایت رو بدیم
