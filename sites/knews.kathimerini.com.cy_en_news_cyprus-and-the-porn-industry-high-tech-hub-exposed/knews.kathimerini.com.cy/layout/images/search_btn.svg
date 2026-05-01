@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-167.1 -45.208 15.967 15.769">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-width: 2px;
+      }
+    </style>
+  </defs>
+  <g id="group-78" transform="translate(-1416 -93)">
+    <ellipse id="ellipse" class="cls-1" cx="4.9" cy="5.016" rx="4.9" ry="5.016" transform="translate(1249.9 48.792)"/>
+    <path id="rectangle" d="M0,0,2.833-.033,2.746,7.355l-2.833.033Z" transform="translate(1257.664 58.24) rotate(-44.599)"/>
+  </g>
+</svg>

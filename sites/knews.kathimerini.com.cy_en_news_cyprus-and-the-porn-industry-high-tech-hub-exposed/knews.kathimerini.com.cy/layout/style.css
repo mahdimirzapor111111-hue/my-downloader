@@ -1,0 +1,117 @@
+
+/* --- Styles for General Tags ----------------------------------------------------------------------- */
+	body, p, table, thead, tbody, tfoot, tr, td, th, span, ul, li, input, select, textarea { font-family: 'Open Sans', sans-serif; font-weight:400; font-size:14px; line-height:1.2857; color:#000; }
+	
+	.ed_body ul {
+		color: #000;
+		margin: 10px 0 25px 5px;      
+		padding: 0;
+		font-size:inherit; line-height:inherit; font-weight:inherit;
+	}
+	.ed_body ul li {
+		color: #000;
+		padding: 3px 0px 3px 20px;
+		position:relative;
+		font-size:inherit; line-height:inherit; font-weight:inherit;
+	}
+	.ed_body ul li:after { content:" "; position:absolute; left:0; top:10px; width:4px; height:4px; border-radius:2px; background-color:#000000;}
+	.ed_body ul:first-child { margin:0 0 25px 5px; }
+	.ed_body ul:last-child { margin:10px 0 0 5px; }
+	
+	.ed_body ol {
+		color: #000;
+		margin: 10px 0 25px 25px;      
+		padding: 0;
+	}
+	.ed_body ol > li {
+		color: #000;
+		padding: 4px 0px 4px 5px;
+		font-weight:400;
+		display:list-item;
+		list-style-type: decimal !important;
+	}
+	.ed_body ol > li > ul {
+		margin: 10px 0 10px 30px !important;
+	}
+	.ed_body ol:last-child { margin-bottom:0 !important; }
+	/* second level */
+	.ed_body ol > li > ol {
+		margin: 4px 0 0 20px;
+	}
+	.ed_body ol > li > ol > li {
+		display:list-item;
+		list-style-type: lower-latin !important;
+	}
+
+	.ed_body a:link,  .ed_body a:visited { color: #205196; text-decoration: none; }
+	.ed_body a:active, .ed_body a:hover { color: #205196; text-decoration: underline; }
+
+	textarea { padding:8px;}
+	
+/* --- User Styles for Page ----------------------------------------------------------------------- */
+
+	.bd_Title {
+		color: #000;
+		font-size: 24px;
+		line-height: 1;
+		text-decoration: none;
+		margin-bottom:18px;
+		font-weight:600;
+	}
+	
+	.bd_SubTitle {
+		color: #000;
+		font-size: 20px;
+		text-decoration: none;
+		font-weight:700;
+	}
+	/*
+	.bd_SubTitle_2 {
+		color:#0c4c8c;
+		line-height: 1;
+		font-size: 16px;
+		font-weight: 700 !important;
+	}
+	*/
+	
+	.bd_Emphasis {
+		font-weight: 700 !important;
+	}
+	
+	.bd_Quote {
+		font-size:12px;
+		color: #000;
+		font-style: italic;
+	}
+	
+	.bd_Small {
+		font-size: 12px;
+	}	
+
+	.bd_Notes {
+		margin-top:25px;
+		padding-top:25px;
+		border-top:1px solid #e5e5e5;
+	 }
+	 
+	.inbody-img { 
+		float:left; margin:0 15px 15px 0; max-width:65% !important;
+    }
+
+
+@media (min-width: 992px) {
+	/*.bd_Title { font-size: 26px; }*/
+
+}
+
+@media (max-width: 991px) {
+	.inbody-img { max-width:45% !important; }
+}
+
+@media (max-width: 480px) {
+	.bd_Title { font-size:20px !important;}	
+	/*.bd_SubTitle {font-size:20px !important; }*/
+
+	.inbody-img { margin:0 auto 15px auto; max-width:100% !important; float:none; clear:both; }
+
+}

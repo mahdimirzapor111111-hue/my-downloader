@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="7215.796 617.479 100.521 100.521">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        clip-path: url(#clip-path);
+      }
+    </style>
+    <clipPath id="clip-path">
+      <path id="path" d="M454.5,65.7v45.818l49.705-22.77L454.5,65.7" transform="translate(-454.5 -65.7)"/>
+    </clipPath>
+  </defs>
+  <g id="group" transform="translate(7215.796 617.479)">
+    <g id="group-2" data-name="group">
+      <g id="group-3" data-name="group">
+        <g id="group-4" data-name="group">
+          <path id="path-2" data-name="path" class="cls-1" d="M491.462,152.723a47.762,47.762,0,1,1,47.762-47.762A47.759,47.759,0,0,1,491.462,152.723Zm0-94.69a46.929,46.929,0,1,0,46.928,46.929A47.049,47.049,0,0,0,491.462,58.033Z" transform="translate(-441.201 -54.979)"/>
+          <path id="path-3" data-name="path" class="cls-1" d="M493.061,156.921a50.261,50.261,0,1,1,50.261-50.261A50.248,50.248,0,0,1,493.061,156.921Zm0-94.69a44.152,44.152,0,1,0,44.151,44.152A44.085,44.085,0,0,0,493.061,62.231Z" transform="translate(-442.8 -56.4)"/>
+        </g>
+      </g>
+    </g>
+    <g id="group-5" data-name="group" transform="translate(32.489 25.825)">
+      <g id="group-6" data-name="group">
+        <g id="group-7" data-name="group" class="cls-2">
+          <g id="group-8" data-name="group" transform="translate(-5.831 -5.831)">
+            <rect id="rectangle" class="cls-1" width="61.368" height="57.758"/>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
