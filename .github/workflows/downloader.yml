@@ -1,4 +1,4 @@
-name: AVASAM-SITE-ULTRA-FIXED
+name: AVASAM-SITE-ULTRA-DOCKER
 
 on:
   workflow_dispatch:
@@ -11,6 +11,10 @@ on:
 jobs:
   ultra:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.44.0-focal
+      options: --ipc=host
+
     permissions:
       contents: write
 
@@ -18,26 +22,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Chromium Dependencies (FULL)
+      - name: Install Node.js inside container
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
-            libxkbcommon0 libxcomposite1 libxdamage1 libxrandr2 libgbm1 \
-            libasound2 libpangocairo-1.0-0 libpango-1.0-0 libcairo2 \
-            libatspi2.0-0 libx11-xcb1 libxshmfence1 libxss1 libgtk-3-0 \
-            libx11-6 libx11-dev libxtst6 libxext6 libxrender1 libxi6 \
-            libglib2.0-0 libgl1-mesa-glx libegl1-mesa
-
-      - name: Install Playwright
-        run: |
-          npm install -g playwright
-          playwright install chromium
+          apt-get update
+          apt-get install -y nodejs npm zip
 
       - name: Create ULTRA script
         run: |
@@ -71,8 +59,7 @@ jobs:
             if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
             const browser = await chromium.launch({
-              headless: true,
-              args: ['--no-sandbox', '--disable-setuid-sandbox']
+              headless: true
             });
 
             const page = await browser.newPage();
@@ -145,11 +132,18 @@ jobs:
         run: |
           node ultra.js ${{ github.event.inputs.urls }}
 
+      - name: Zip results
+        run: |
+          cd sites
+          for d in */ ; do
+            zip -r "${d%/}.zip" "$d"
+          done
+
       - name: Commit & Push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add sites/
-          git commit -m "[AVASAM-SITE-ULTRA-FIXED] Full website snapshot" || echo "Nothing to commit"
+          git commit -m "[AVASAM-SITE-ULTRA-DOCKER] Full website snapshot" || echo "Nothing to commit"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin HEAD:"${GITHUB_REF_NAME}"
