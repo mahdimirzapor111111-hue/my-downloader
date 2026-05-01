@@ -1,86 +1,34 @@
-name: 📥 دانلودر شخصی
+name: Download and Save to Downloads Folder
 
 on:
   workflow_dispatch:
     inputs:
       urls:
-        description: 'لینک‌های دانلود (هر خط یکی)'
+        description: 'لینک دانلود (فقط یک لینک)'
         required: true
-        type: string
-      split_size:
-        description: 'حداکثر حجم هر فایل به مگابایت'
-        required: false
-        default: '90'
-        type: string
 
 jobs:
-  downloader:
+  download:
     runs-on: ubuntu-latest
     steps:
-      - name: 📂 دریافت فایل‌های مخزن
+      - name: Checkout main branch
         uses: actions/checkout@v4
+        with:
+          ref: main
 
-      - name: 🔧 نصب ابزارها
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq aria2 zip
-
-      - name: 📁 ساخت پوشه‌ها
+      - name: Setup tools and folders
         run: |
+          sudo apt update && sudo apt install -y aria2
           mkdir -p downloads
-          mkdir -p temp_dl
 
-      - name: ⬇️ دانلود فایل‌ها
+      - name: Download files
         run: |
-          echo "$LINKS" | while IFS= read -r url; do
-            [ -z "$url" ] && continue
-            echo "در حال دانلود: $url"
-            aria2c \
-              --dir=temp_dl \
-              --split=3 \
-              --min-split-size=50M \
-              --continue=true \
-              --max-connection-per-server=3 \
-              --console-log-level=error \
-              "$url"
-          done
-        env:
-          LINKS: ${{ inputs.urls }}
+          echo "Downloading: ${{ github.event.inputs.urls }}"
+          aria2c --dir=downloads --split=2 "${{ github.event.inputs.urls }}"
 
-      - name: 🔄 پردازش و انتقال فایل‌ها
-        run: |
-          for filepath in temp_dl/*; do
-            [ -f "$filepath" ] || continue
-            filename=$(basename "$filepath")
-            size_mb=$(du -m "$filepath" | cut -f1)
-            
-            if [ "$size_mb" -gt "$MAX" ]; then
-              echo "تقسیم $filename با حجم ${size_mb}MB"
-              (cd temp_dl && zip -q -s "${MAX}m" "../downloads/${filename}.zip" "$filename")
-            else
-              echo "انتقال $filename"
-              mv "$filepath" "downloads/"
-            fi
-          done
-        env:
-          MAX: ${{ inputs.split_size }}
-
-      - name: 📤 ارسال تدریجی به مخزن
+      - name: Commit and push to main
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
-          
-          # لیست فایل‌های جدید
-          new_files=$(git ls-files --others --exclude-standard downloads/)
-          if [ -z "$new_files" ]; then
-            echo "فایل جدیدی برای ارسال نیست"
-            exit 0
-          fi
-          
-          # ۵ تا ۵ تا ارسال
-          echo "$new_files" | xargs -r -n 5 sh -c '
-            git add "$@" && \
-            git commit -m "📦 افزودن فایل" && \
-            git push || echo "تلاش مجدد..."
-          ' _
-
-      - name: 🧹 پاکسازی
-        run: rm -rf temp_dl
+          git add downloads/
+          git diff --staged --quiet || (git commit -m "Add file to downloads" && git push origin main)
