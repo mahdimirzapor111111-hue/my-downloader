@@ -29,9 +29,9 @@ jobs:
           mkdir -p sites
 
           for URL in $URLS; do
-            SAFENAME=$(echo "$URL" | sed 's~https\?://; s~/g; s/[^A-Za-z0-9.-]//g')
-            TARGETDIR="sites/${SAFENAME}"
-            HTMLFILE="${TARGETDIR}.html"
+            SAFE_NAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]/_/g')
+            TARGET_DIR="sites/${SAFE_NAME}"
+            HTML_FILE="${TARGET_DIR}.html"
 
             echo "🌐 Processing $URL"
             mkdir -p "$TARGET_DIR"
@@ -67,5 +67,5 @@ jobs:
 
           git add sites/
           git commit -m "[AVASAM] Deep website download" || echo "Nothing to commit"
-          git pull --rebase origin "${GITHUBREFNAME}"
-          git push origin HEAD:"${GITHUBREFNAME}"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
