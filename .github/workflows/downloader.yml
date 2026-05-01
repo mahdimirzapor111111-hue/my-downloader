@@ -29,9 +29,8 @@ jobs:
           mkdir -p sites
 
           for URL in $URLS; do
-            SAFE_NAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]/_/g')
-            TARGET_DIR="sites/${SAFE_NAME}"
-            HTML_FILE="${TARGET_DIR}.html"
+            SAFENAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]/_/g')
+            TARGET_DIR="sites/${SAFENAME}"
 
             echo "🌐 Processing $URL"
             mkdir -p "$TARGET_DIR"
@@ -57,7 +56,32 @@ jobs:
             echo "📄 Saving HTML fallback"
             curl -L --fail \
               -H "User-Agent: Mozilla/5.0" \
-              "$URL" -o "$HTML_FILE" || echo "❌ Could not download HTML"
+              "$URL" -o "${TARGET_DIR}/fallback.html" || echo "❌ Could not download HTML"
+
+            echo "🧩 Building offline index.html"
+            INDEX="${TARGET_DIR}/index.html"
+
+            # پیدا کردن بهترین صفحه برای نمایش
+            MAIN_PAGE=$(find "$TARGET_DIR" -type f \( -name "index.html" -o -name "*.html" \) | head -n 1)
+
+            echo "<html><head><meta charset='UTF-8'><title>Offline Site Viewer</title></head><body>" > "$INDEX"
+            echo "<h1>Offline Viewer for $URL</h1>" >> "$INDEX"
+
+            if [ -n "$MAIN_PAGE" ]; then
+              REL=$(realpath --relative-to="$TARGET_DIR" "$MAIN_PAGE")
+              echo "<p><a href='$REL'>Open main page</a></p>" >> "$INDEX"
+            else
+              echo "<p>No main page found. Showing fallback.</p>" >> "$INDEX"
+              echo "<p><a href='fallback.html'>Open fallback</a></p>" >> "$INDEX"
+            fi
+
+            echo "<h2>All pages</h2><ul>" >> "$INDEX"
+            find "$TARGET_DIR" -type f -name "*.html" | while read FILE; do
+              REL=$(realpath --relative-to="$TARGET_DIR" "$FILE")
+              echo "<li><a href='$REL'>$REL</a></li>" >> "$INDEX"
+            done
+            echo "</ul></body></html>" >> "$INDEX"
+
           done
 
       - name: Commit & Push
@@ -66,6 +90,6 @@ jobs:
           git config user.email "github-actions@github.com"
 
           git add sites/
-          git commit -m "[AVASAM] Deep website download" || echo "Nothing to commit"
+          git commit -m "[AVASAM] Deep website download + offline viewer" || echo "Nothing to commit"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin HEAD:"${GITHUB_REF_NAME}"
