@@ -1,28 +1,29 @@
-name: AVASAM - Download from URLs & Save to Repo
+name: AVASAM - Download & View Websites
 
 on:
   workflow_dispatch:
     inputs:
       urls:
-        description: 'Space-separated list of URLs to download'
+        description: 'لیست URLهای سایت‌ها (مثل https://youtube.com)'
         required: true
         type: string
-      mode:
-        description: 'Download mode'
+      view_mode:
+        description: 'حالت نمایش'
         required: false
-        default: 'normal'
+        default: 'html'
         type: choice
         options:
-          - normal
-          - zip
+          - html      # فقط صفحه اصلی
+          - full      # دانلود کامل سایت (CSS, JS, Images)
+          - single    # یک فایل HTML ساده
       split_threshold_mb:
-        description: 'Split files larger than this MB (0 = never split)'
+        description: 'تقسیم فایل‌های بزرگتر از (۰ = هرگز تقسیم نشود)'
         required: false
         default: 90
         type: number
 
 jobs:
-  save-file:
+  save-website:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -32,103 +33,267 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install aria2 and zip
+      - name: Install tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y aria2 zip
+          sudo apt-get install -y wget zip httrack
 
-      - name: AVASAM Downloader - https://avasam.ir
+      - name: AVASAM Website Downloader
         run: |
-          echo "🏷️  AVASAM - Your Download Solution"
+          echo "🏷️ AVASAM - Website Archiver"
           echo "🌐 https://avasam.ir"
           echo ""
 
-      - name: Download files
+      - name: Download websites
         run: |
-          MODE="${{ github.event.inputs.mode }}"
+          MODE="${{ github.event.inputs.view_mode }}"
           URLS="${{ github.event.inputs.urls }}"
-          SPLIT_THRESHOLD_MB="${{ github.event.inputs.split_threshold_mb }}"
-          SPLIT_THRESHOLD_BYTES=$(( SPLIT_THRESHOLD_MB * 1024 * 1024 ))
+          
+          mkdir -p downloads/www
+          mkdir -p downloads/snapshots
 
-          echo "🏷️  AVASAM (https://avasam.ir) - Downloading with mode: $MODE"
-          echo "Split threshold: $SPLIT_THRESHOLD_MB MB"
-
-          mkdir -p downloads tmp_downloads
-
-          # Download each URL
           for URL in $URLS; do
-            FILENAME=$(basename "$URL")
-            echo "⬇️ Downloading $URL -> $FILENAME"
-            aria2c \
-              --split=2 \
-              --max-connection-per-server=2 \
-              --min-split-size=90M \
-              --dir="tmp_downloads" \
-              --out="$FILENAME" \
-              "$URL"
+            # ساخت نام پوشه از روی URL
+            SITE_NAME=$(echo "$URL" | sed 's|https\?://||' | sed 's|/|_|g')
+            
+            if [ "$MODE" = "full" ]; then
+              echo "📥 Downloading full website: $URL"
+              # httrack برای دانلود کامل سایت
+              httrack "$URL" -O "downloads/www/$SITE_NAME" \
+                --depth=3 \
+                --mirror \
+                --robots=0 \
+                --quiet
+              
+              # ایجاد فایل ایندکس برای نمایش
+              echo "<html><head><meta http-equiv='refresh' content='0;url=./$SITE_NAME/index.html'></head></html>" \
+                > "downloads/www/$SITE_NAME.html"
+              
+            elif [ "$MODE" = "single" ]; then
+              echo "📄 Downloading single page: $URL"
+              wget --page-requisites \
+                   --adjust-extension \
+                   --convert-links \
+                   --directory-prefix="downloads/www/$SITE_NAME" \
+                   --output-document="downloads/www/$SITE_NAME/index.html" \
+                   "$URL"
+            else
+              # حالت html ساده
+              echo "🌐 Saving HTML snapshot: $URL"
+              wget -O "downloads/snapshots/${SITE_NAME}.html" "$URL"
+            fi
           done
 
-          # Zip all downloads if mode is 'zip'
-          if [ "$MODE" = "zip" ]; then
-            ARCHIVE_NAME="downloads/archive_$(date +%Y%m%d_%H%M%S).zip"
-            echo "📦 Creating zip archive: $ARCHIVE_NAME"
-            zip -j "$ARCHIVE_NAME" tmp_downloads/*
-            rm -rf tmp_downloads
-          else
-            # Normal mode: handle splitting large files
-            for FILE in tmp_downloads/*; do
-              [ -f "$FILE" ] || continue
-              SIZE=$(stat -c%s "$FILE")
-              BASENAME=$(basename "$FILE")
+      - name: Create main viewer page
+        run: |
+          cat > downloads/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVASAM Web Viewer - آرشیو وب‌سایت‌ها</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tahoma', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .header {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .sites-list {
+            padding: 30px;
+        }
+        .site-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .site-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff0000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .site-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .site-url {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+        .view-btn {
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .preview-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            display: none;
+            border: none;
+        }
+        .close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f0f0f0;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 AVASAM Web Viewer</h1>
+            <p>مشاهده وب‌سایت‌های آرشیو شده بدون محدودیت</p>
+            <small>🌐 https://avasam.ir</small>
+        </div>
+        
+        <div class="sites-list" id="sitesList">
+            <div style="text-align: center; padding: 50px;">
+                ⏳ در حال بارگذاری لیست سایت‌ها...
+            </div>
+        </div>
+        
+        <div class="footer">
+            🔒 این سایت‌ها توسط AVASAM آرشیو شده‌اند<br>
+            ⚡ با استفاده از GitHub Actions - دسترسی آزاد به محتوای وب
+        </div>
+    </div>
+    
+    <iframe id="previewFrame" class="preview-frame"></iframe>
+    
+    <script>
+        // لیست فایل‌های آرشیو شده
+        async function loadSites() {
+            try {
+                const response = await fetch('sites.json');
+                const sites = await response.json();
+                displaySites(sites);
+            } catch(e) {
+                // اگر فایل json نبود، از لیست پیش‌فرض استفاده کن
+                loadFromDirectory();
+            }
+        }
+        
+        function loadFromDirectory() {
+            // اسکن خودکار پوشه snapshots و www
+            const sites = [
+                { name: "YouTube", url: "/snapshots/youtube.com.html", type: "snapshot" },
+                { name: "Other Sites", url: "/www", type: "full" }
+            ];
+            displaySites(sites);
+        }
+        
+        function displaySites(sites) {
+            const container = document.getElementById('sitesList');
+            container.innerHTML = '';
+            
+            sites.forEach(site => {
+                const card = document.createElement('div');
+                card.className = 'site-card';
+                card.innerHTML = `
+                    <div class="site-title">🌐 ${site.name}</div>
+                    <div class="site-url">${site.url}</div>
+                    <button class="view-btn" onclick="viewSite('${site.url}')">👁️ مشاهده سایت</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function viewSite(url) {
+            const frame = document.getElementById('previewFrame');
+            frame.style.display = 'block';
+            frame.src = url;
+            
+            // دکمه بستن
+            if (!document.getElementById('customCloseBtn')) {
+                const closeBtn = document.createElement('button');
+                closeBtn.id = 'customCloseBtn';
+                closeBtn.className = 'close-btn';
+                closeBtn.innerHTML = '✖ بستن';
+                closeBtn.onclick = () => {
+                    frame.style.display = 'none';
+                    frame.src = 'about:blank';
+                };
+                document.body.appendChild(closeBtn);
+            }
+        }
+        
+        loadSites();
+    </script>
+</body>
+</html>
+EOF
 
-              if [ "$SPLIT_THRESHOLD_BYTES" -gt 0 ] && [ "$SIZE" -gt "$SPLIT_THRESHOLD_BYTES" ]; then
-                echo "✂️ $BASENAME is $(( SIZE / 1024 / 1024 ))MB — splitting into ${SPLIT_THRESHOLD_MB}MB parts (zip-split)"
-                # Create a zip split into parts that can be reassembled with `zip -F`
-                zip -0 -s "${SPLIT_THRESHOLD_MB}m" "downloads/${BASENAME}.zip" -j "$FILE"
-                echo "✅ Parts: $(ls downloads/${BASENAME}.z* 2>/dev/null | wc -l)"
-              else
-                cp "$FILE" "downloads/$BASENAME"
-              fi
-            done
-            rm -rf tmp_downloads
-          fi
+      - name: Create sites list JSON
+        run: |
+          cat > downloads/sites.json << EOF
+          {
+            "sites": [
+              {
+                "name": "YouTube",
+                "url": "/snapshots/youtube.com.html",
+                "date": "$(date +%Y-%m-%d)",
+                "type": "snapshot"
+              }
+            ]
+          }
+          EOF
 
-      - name: Commit & Push in batches of 5 files (AVASAM)
+      - name: Commit & Push
         run: |
           BRANCH="${GITHUB_REF_NAME}"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-
-          echo "🏷️  AVASAM (https://avasam.ir) - Preparing to commit files"
-
-          # Collect all new/modified files under downloads/
-          mapfile -t ALL_FILES < <(git ls-files --others --modified --exclude-standard downloads/)
-
-          TOTAL=${#ALL_FILES[@]}
-          echo "📦 Total files to push: $TOTAL"
-
-          if [ "$TOTAL" -eq 0 ]; then
-            echo "Nothing to commit"
-            exit 0
-          fi
-
-          BATCH_SIZE=5
-          BATCH_NUM=0
-
-          for (( i=0; i<TOTAL; i+=BATCH_SIZE )); do
-            BATCH_NUM=$(( BATCH_NUM + 1 ))
-            BATCH=("${ALL_FILES[@]:i:BATCH_SIZE}")
-
-            echo "🚀 Pushing batch $BATCH_NUM: files $((i+1))–$(( i + ${#BATCH[@]} )) of $TOTAL"
-
-            git add "${BATCH[@]}"
-            git commit -m "[AVASAM] Add downloaded files — batch $BATCH_NUM [skip ci]"
-
-            # Pull with rebase before each push to avoid conflicts
-            git pull --rebase origin "$BRANCH"
-            git push origin HEAD:"$BRANCH"
-
-            echo "✅ Batch $BATCH_NUM pushed"
-          done
-
-          echo "🎉 All $TOTAL files pushed in $BATCH_NUM batch(es) — AVASAM (https://avasam.ir)"
+          
+          git add downloads/
+          git commit -m "[AVASAM] Add website archives - $(date +%Y%m%d_%H%M%S)" || echo "Nothing to commit"
+          git pull --rebase origin "$BRANCH"
+          git push origin HEAD:"$BRANCH"
