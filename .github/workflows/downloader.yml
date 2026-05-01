@@ -39,7 +39,7 @@ jobs:
           URLS="${{ github.event.inputs.urls }}"
           mkdir -p sites scripts
 
-          cat > scripts/render_and_save.js << 'EOF'
+          cat > scripts/renderandsave.js << 'EOF'
           const fs = require('fs');
           const path = require('path');
           const { chromium } = require('playwright');
@@ -49,7 +49,7 @@ jobs:
             const outFile = process.argv[3];
 
             if (!url || !outFile) {
-              console.error('Usage: node render_and_save.js <url> <output-file>');
+              console.error('Usage: node renderandsave.js <url> <output-file>');
               process.exit(1);
             }
 
@@ -58,15 +58,18 @@ jobs:
               userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
             });
 
+            // محدود کردن timeout کلی
+            page.setDefaultTimeout(20000);
+            page.setDefaultNavigationTimeout(20000);
+
             try {
               console.log('🌐 Opening:', url);
-              await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+              await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 40000 });
 
-              // کمی صبر برای لود کامل
+              // کمی صبر برای لود اولیه
               await page.waitForTimeout(3000);
 
-              // تلاش برای بستن overlay ها
-              const selectors = [
+              const overlaySelectors = [
                 'button:has-text("OK")',
                 'button:has-text("Ok")',
                 'button:has-text("Ok!")',
@@ -82,21 +85,32 @@ jobs:
                 '[role="button"]:has-text("Enter")'
               ];
 
-              for (const sel of selectors) {
-                try {
-                  const btn = await page.$(sel);
-                  if (btn) {
-                    console.log('🕹 Clicking overlay-like button:', sel);
-                    await btn.click();
-                    await page.waitForTimeout(1500);
-                    break;
+              // حداکثر 3 تلاش برای بستن overlay
+              for (let attempt = 0; attempt < 3; attempt++) {
+                let clicked = false;
+
+                for (const sel of overlaySelectors) {
+                  try {
+                    const btn = await page.$(sel);
+                    if (btn) {
+                      console.log(`🕹 [Attempt ${attempt + 1}] Clicking overlay-like button:`, sel);
+                      await btn.click({ delay: 50 });
+                      clicked = true;
+                      await page.waitForTimeout(1500);
+                      break;
+                    }
+                  } catch (e) {
+                    // نادیده بگیر
                   }
-                } catch (e) {
-                  // نادیده بگیر
+                }
+
+                if (!clicked) {
+                  console.log('ℹ️ No overlay-like button found in this attempt, stopping overlay handling.');
+                  break;
                 }
               }
 
-              // دوباره کمی صبر بعد از کلیک
+              // کمی صبر بعد از آخرین تلاش
               await page.waitForTimeout(2000);
 
               const content = await page.content();
@@ -114,7 +128,7 @@ jobs:
           EOF
 
           for URL in $URLS; do
-            # ساخت نام امن برای پوشه
+            # ساخت نام امن برای پوشه (باگ sed اینجا بود)
             SAFENAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]//g')
             TARGETDIR="sites/${SAFENAME}"
             HTMLFILE="${TARGETDIR}/index.rendered.html"
@@ -125,7 +139,7 @@ jobs:
             echo "🕸 Deep mirror with assets (wget)..."
             wget \
               --recursive \
-              --level=5 \
+              --level=3 \
               --page-requisites \
               --convert-links \
               --adjust-extension \
@@ -135,23 +149,23 @@ jobs:
               --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
               --accept="html,htm,css,js,jpg,jpeg,png,gif,webp,svg,mp4,webm,ogg,mp3,woff,woff2,ttf,otf,json" \
               --timeout=20 \
-              --tries=3 \
+              --tries=2 \
               -e robots=off \
               -P "$TARGETDIR" \
               "$URL" || echo "⚠️ Mirror failed (wget), will still try Playwright HTML render"
 
             echo "📄 Saving rendered HTML with Playwright"
-            node scripts/render_and_save.js "$URL" "$HTMLFILE" || echo "❌ Playwright render failed for $URL"
+            node scripts/renderandsave.js "$URL" "$HTMLFILE" || echo "❌ Playwright render failed for $URL"
           done
 
       - name: Commit & Push
         env:
-          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUBREFNAME: ${{ github.ref_name }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
           git add sites/ || true
           git commit -m "[AVASAM] Deep website download" || echo "Nothing to commit"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin HEAD:"${GITHUB_REF_NAME}"
+          git pull --rebase origin "${GITHUBREFNAME}"
+          git push origin HEAD:"${GITHUBREFNAME}"
