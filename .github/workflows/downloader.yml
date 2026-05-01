@@ -18,47 +18,140 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install monolith
-        run: |
-          # دانلود نسخه از پیش کامپایل شده monolith
-          curl -L https://github.com/Y2Z/monolith/releases/download/v2.8.3/monolith-gnu-linux-x86_64 -o monolith
-          chmod +x monolith
-          sudo mv monolith /usr/local/bin/
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Convert each URL to self-contained HTML
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget curl
+          npm init -y
+          npm install playwright@latest
+
+      - name: Install Playwright browsers
+        run: |
+          npx playwright install --with-deps
+
+      - name: Deep Website Downloader (AVASAM + Playwright HTML render)
         run: |
           URLS="${{ github.event.inputs.urls }}"
-          mkdir -p sites
+          mkdir -p sites scripts
+
+          cat > scripts/render_and_save.js << 'EOF'
+          const fs = require('fs');
+          const path = require('path');
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const url = process.argv[2];
+            const outFile = process.argv[3];
+
+            if (!url || !outFile) {
+              console.error('Usage: node render_and_save.js <url> <output-file>');
+              process.exit(1);
+            }
+
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({
+              userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36'
+            });
+
+            try {
+              console.log('🌐 Opening:', url);
+              await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+
+              // کمی صبر برای لود کامل
+              await page.waitForTimeout(3000);
+
+              // تلاش برای بستن overlay ها
+              const selectors = [
+                'button:has-text("OK")',
+                'button:has-text("Ok")',
+                'button:has-text("Ok!")',
+                'button:has-text("Accept")',
+                'button:has-text("I Accept")',
+                'button:has-text("Agree")',
+                'button:has-text("I Agree")',
+                'button:has-text("Continue")',
+                'button:has-text("Enter")',
+                '[role="button"]:has-text("OK")',
+                '[role="button"]:has-text("Accept")',
+                '[role="button"]:has-text("Continue")',
+                '[role="button"]:has-text("Enter")'
+              ];
+
+              for (const sel of selectors) {
+                try {
+                  const btn = await page.$(sel);
+                  if (btn) {
+                    console.log('🕹 Clicking overlay-like button:', sel);
+                    await btn.click();
+                    await page.waitForTimeout(1500);
+                    break;
+                  }
+                } catch (e) {
+                  // نادیده بگیر
+                }
+              }
+
+              // دوباره کمی صبر بعد از کلیک
+              await page.waitForTimeout(2000);
+
+              const content = await page.content();
+              const dir = path.dirname(outFile);
+              fs.mkdirSync(dir, { recursive: true });
+              fs.writeFileSync(outFile, content, 'utf-8');
+              console.log('✅ Saved rendered HTML to', outFile);
+            } catch (err) {
+              console.error('❌ Playwright render failed:', err);
+              process.exitCode = 1;
+            } finally {
+              await browser.close();
+            }
+          })();
+          EOF
 
           for URL in $URLS; do
-            SAFENAME=$(echo "$URL" | sed 's~https\?://~~; s~/~-~g; s/[^A-Za-z0-9._-]//g')
-            OUTPUTFILE="sites/${SAFENAME}.html"
+            # ساخت نام امن برای پوشه
+            SAFENAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]//g')
+            TARGETDIR="sites/${SAFENAME}"
+            HTMLFILE="${TARGETDIR}/index.rendered.html"
 
-            echo "🌐 Processing $URL -> $OUTPUTFILE"
+            echo "🌐 Processing $URL"
+            mkdir -p "$TARGETDIR"
 
-            # monolith تمام دارایی‌ها را درون فایل HTML قرار می‌دهد
-            monolith "$URL" \
+            echo "🕸 Deep mirror with assets (wget)..."
+            wget \
+              --recursive \
+              --level=5 \
+              --page-requisites \
+              --convert-links \
+              --adjust-extension \
+              --no-parent \
+              --span-hosts \
+              --domains=$(echo "$URL" | awk -F/ '{print $3}') \
               --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
-              --timeout=30 \
-              --no-frames \
-              -o "$OUTPUTFILE" \
-              || echo "⚠️ monolith failed for $URL, falling back to simple curl"
+              --accept="html,htm,css,js,jpg,jpeg,png,gif,webp,svg,mp4,webm,ogg,mp3,woff,woff2,ttf,otf,json" \
+              --timeout=20 \
+              --tries=3 \
+              -e robots=off \
+              -P "$TARGETDIR" \
+              "$URL" || echo "⚠️ Mirror failed (wget), will still try Playwright HTML render"
 
-            # اگر monolith شکست خورد، HTML ساده را ذخیره کن
-            if [ ! -s "$OUTPUTFILE" ]; then
-              echo "📄 Fallback HTML-only download"
-              curl -L --fail \
-                -H "User-Agent: Mozilla/5.0" \
-                "$URL" -o "$OUTPUTFILE" || echo "❌ Could not download HTML"
-            fi
+            echo "📄 Saving rendered HTML with Playwright"
+            node scripts/render_and_save.js "$URL" "$HTMLFILE" || echo "❌ Playwright render failed for $URL"
           done
 
       - name: Commit & Push
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add sites/
-          git commit -m "[AVASAM] Self-contained website HTML(s) saved" || echo "Nothing to commit"
+          git add sites/ || true
+          git commit -m "[AVASAM] Deep website download" || echo "Nothing to commit"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin HEAD:"${GITHUB_REF_NAME}"
