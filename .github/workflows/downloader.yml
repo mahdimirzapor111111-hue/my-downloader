@@ -1,4 +1,4 @@
-name: AVASAM - Single File Website Downloader
+name: AVASAM - Deep Asset Website Downloader
 
 on:
   workflow_dispatch:
@@ -18,188 +18,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install tools
+      - name: Install monolith
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget curl
+          # دانلود نسخه از پیش کامپایل شده monolith
+          curl -L https://github.com/Y2Z/monolith/releases/download/v2.8.3/monolith-gnu-linux-x86_64 -o monolith
+          chmod +x monolith
+          sudo mv monolith /usr/local/bin/
 
-      - name: Download Websites as Single HTML Files
+      - name: Convert each URL to self-contained HTML
         run: |
           URLS="${{ github.event.inputs.urls }}"
           mkdir -p sites
 
           for URL in $URLS; do
-            # Clean domain name for filename
-            DOMAIN=$(echo "$URL" | sed 's~https\?://~~; s~/.*~~')
-            SAFENAME=$(echo "$DOMAIN" | sed 's/[^A-Za-z0-9.-]/_/g')
-            OUTPUT_FILE="sites/${SAFENAME}.html"
+            SAFENAME=$(echo "$URL" | sed 's~https\?://~~; s~/~-~g; s/[^A-Za-z0-9._-]//g')
+            OUTPUTFILE="sites/${SAFENAME}.html"
 
-            echo "🌐 Processing: $URL"
-            echo "📦 Downloading complete website structure..."
+            echo "🌐 Processing $URL -> $OUTPUTFILE"
 
-            # Step 1: Download everything with wget
-            DOWNLOAD_DIR="temp_$(date +%s)"
-            mkdir -p "$DOWNLOAD_DIR"
-            
-            wget \
-              --recursive \
-              --level=3 \
-              --page-requisites \
-              --convert-links \
-              --adjust-extension \
-              --no-parent \
-              --span-hosts \
-              --domains="$DOMAIN" \
-              --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
+            # monolith تمام دارایی‌ها را درون فایل HTML قرار می‌دهد
+            monolith "$URL" \
+              --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
               --timeout=30 \
-              --tries=3 \
-              --random-wait \
-              -e robots=off \
-              -P "$DOWNLOAD_DIR" \
-              "$URL" || echo "⚠️ Partial download (some files might be missing)"
+              --no-frames \
+              -o "$OUTPUTFILE" \
+              || echo "⚠️ monolith failed for $URL, falling back to simple curl"
 
-            echo "🔄 Creating single-file HTML with embedded assets..."
-
-            # Step 2: Find the main HTML file
-            MAIN_HTML=$(find "$DOWNLOAD_DIR/$DOMAIN" -name "index.html" -o -name "*.html" | head -1)
-            
-            if [ -z "$MAIN_HTML" ]; then
-              # If no HTML found in wget, fallback to curl
-              echo "⚠️ No HTML found, using curl fallback..."
-              curl -L \
+            # اگر monolith شکست خورد، HTML ساده را ذخیره کن
+            if [ ! -s "$OUTPUTFILE" ]; then
+              echo "📄 Fallback HTML-only download"
+              curl -L --fail \
                 -H "User-Agent: Mozilla/5.0" \
-                "$URL" -o "$OUTPUT_FILE"
-              continue
+                "$URL" -o "$OUTPUTFILE" || echo "❌ Could not download HTML"
             fi
-
-            # Step 3: Create self-contained HTML with inline assets
-            python3 << PYEOF
-import os
-import re
-import base64
-from pathlib import Path
-from urllib.parse import urljoin
-
-html_file = "$MAIN_HTML"
-download_dir = "$DOWNLOAD_DIR/$DOMAIN"
-output_file = "$OUTPUT_FILE"
-
-with open(html_file, 'r', encoding='utf-8', errors='ignore') as f:
-    content = f.read()
-
-# Inline CSS files
-css_pattern = re.compile(r'<link[^>]*href=["\']([^"\']+\.css)["\'][^>]*>', re.IGNORECASE)
-for match in css_pattern.finditer(content):
-    css_href = match.group(1)
-    css_path = os.path.join(download_dir, css_href.split('?')[0].lstrip('./'))
-    if os.path.exists(css_path):
-        with open(css_path, 'r', encoding='utf-8', errors='ignore') as f:
-            css_content = f.read()
-        style_tag = f'<style>\n{css_content}\n</style>'
-        content = content.replace(match.group(0), style_tag)
-
-# Inline JavaScript files
-js_pattern = re.compile(r'<script[^>]*src=["\']([^"\']+\.js)["\'][^>]*></script>', re.IGNORECASE)
-for match in js_pattern.finditer(content):
-    js_src = match.group(1)
-    js_path = os.path.join(download_dir, js_src.split('?')[0].lstrip('./'))
-    if os.path.exists(js_path):
-        with open(js_path, 'r', encoding='utf-8', errors='ignore') as f:
-            js_content = f.read()
-        script_tag = f'<script>\n{js_content}\n</script>'
-        content = content.replace(match.group(0), script_tag)
-
-# Inline small images (under 500KB)
-img_pattern = re.compile(r'<img[^>]*src=["\']([^"\']+)["\']', re.IGNORECASE)
-for match in img_pattern.finditer(content):
-    img_src = match.group(1)
-    if img_src.startswith('data:'):
-        continue
-    
-    img_path = os.path.join(download_dir, img_src.split('?')[0].lstrip('./'))
-    if os.path.exists(img_path) and os.path.getsize(img_path) < 500000:
-        try:
-            with open(img_path, 'rb') as f:
-                img_data = base64.b64encode(f.read()).decode()
-            ext = os.path.splitext(img_path)[1].lower()
-            mime_types = {'.jpg': 'jpeg', '.jpeg': 'jpeg', '.png': 'png', '.gif': 'gif', '.svg': 'svg+xml', '.webp': 'webp'}
-            mime = mime_types.get(ext, 'jpeg')
-            data_uri = f'data:image/{mime};base64,{img_data}'
-            content = content.replace(img_src, data_uri)
-        except:
-            pass
-
-# Save as self-contained HTML
-os.makedirs(os.path.dirname(output_file), exist_ok=True)
-with open(output_file, 'w', encoding='utf-8') as f:
-    f.write(content)
-PYEOF
-
-            # Step 4: Clean up temp files
-            rm -rf "$DOWNLOAD_DIR"
-
-            # Check result
-            if [ -f "$OUTPUT_FILE" ]; then
-              FILESIZE=$(du -h "$OUTPUT_FILE" | cut -f1)
-              LINES=$(wc -l < "$OUTPUT_FILE")
-              echo "✅ Created: $OUTPUT_FILE (${FILESIZE}, ${LINES} lines)"
-            else
-              echo "❌ Failed to create $OUTPUT_FILE"
-            fi
-
           done
-
-      - name: Create browser index
-        run: |
-          cat > sites/index.html << 'EOF'
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>AVASAM - Downloaded Sites</title>
-            <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                     min-height: 100vh; padding: 40px 20px; }
-              .container { max-width: 800px; margin: 0 auto; }
-              h1 { color: white; text-align: center; margin-bottom: 40px; font-size: 2.5em; }
-              .site { background: white; padding: 20px 25px; margin: 15px 0; border-radius: 12px; 
-                      box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.2s; }
-              .site:hover { transform: translateY(-3px); }
-              a { color: #667eea; text-decoration: none; font-size: 18px; font-weight: 500; 
-                  word-break: break-all; }
-              a:hover { color: #764ba2; }
-              .icon { font-size: 24px; margin-right: 10px; }
-              .footer { text-align: center; color: white; margin-top: 40px; opacity: 0.8; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <h1>🌐 Downloaded Websites</h1>
-          EOF
-          
-          for file in sites/*.html; do
-            [ "$file" = "sites/index.html" ] && continue
-            filename=$(basename "$file")
-            filesize=$(du -h "$file" | cut -f1)
-            echo "<div class='site'>" >> sites/index.html
-            echo "<span class='icon'>📄</span>" >> sites/index.html
-            echo "<a href='$filename'>$filename</a>" >> sites/index.html
-            echo "<br><small style='color:#666;'>Size: $filesize</small>" >> sites/index.html
-            echo "</div>" >> sites/index.html
-          done
-          
-          echo "<div class='footer'>Generated by AVASAM Downloader</div>" >> sites/index.html
-          echo "</div></body></html>" >> sites/index.html
 
       - name: Commit & Push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          
+
           git add sites/
-          git commit -m "[AVASAM] Single-file website downloads - $(date +'%Y-%m-%d %H:%M')" || echo "Nothing to commit"
-          git pull --rebase origin "${GITHUB_REF_NAME}" || git pull origin "${GITHUB_REF_NAME}"
-          git push origin HEAD:"${GITHUB_REF_NAME}" || git push origin HEAD
+          git commit -m "[AVASAM] Self-contained website HTML(s) saved" || echo "Nothing to commit"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
