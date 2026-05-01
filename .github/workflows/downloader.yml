@@ -1,4 +1,4 @@
-name: AVASAM - Deep Asset Website Downloader
+name: AVASAM - Single File Website Downloader
 
 on:
   workflow_dispatch:
@@ -21,75 +21,96 @@ jobs:
       - name: Install tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget curl
+          sudo apt-get install -y wget curl npm
+          # Install monolith for single-file website saving
+          sudo npm install -g monolith
 
-      - name: Deep Website Downloader (AVASAM)
+      - name: Download Websites as Single HTML Files
         run: |
           URLS="${{ github.event.inputs.urls }}"
           mkdir -p sites
 
           for URL in $URLS; do
-            SAFENAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]/_/g')
-            TARGET_DIR="sites/${SAFENAME}"
+            # Clean domain name for filename
+            DOMAIN=$(echo "$URL" | sed 's~https\?://~~; s~/.*~~')
+            SAFENAME=$(echo "$DOMAIN" | sed 's/[^A-Za-z0-9.-]/_/g')
+            OUTPUT_FILE="sites/${SAFENAME}.html"
 
-            echo "🌐 Processing $URL"
-            mkdir -p "$TARGET_DIR"
+            echo "🌐 Processing: $URL"
+            echo "📦 Creating single-file HTML with all assets embedded..."
 
-            echo "🕸 Deep mirror with assets..."
-            wget \
-              --recursive \
-              --level=5 \
-              --page-requisites \
-              --convert-links \
-              --adjust-extension \
-              --no-parent \
-              --span-hosts \
-              --domains=$(echo "$URL" | awk -F/ '{print $3}') \
-              --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
-              --accept="html,htm,css,js,jpg,jpeg,png,gif,webp,svg,mp4,webm,ogg,mp3,woff,woff2,ttf,otf,json" \
-              --timeout=20 \
-              --tries=3 \
-              -e robots=off \
-              -P "$TARGET_DIR" \
-              "$URL" || echo "⚠️ Mirror failed, falling back to HTML-only"
-
-            echo "📄 Saving HTML fallback"
-            curl -L --fail \
-              -H "User-Agent: Mozilla/5.0" \
-              "$URL" -o "${TARGET_DIR}/fallback.html" || echo "❌ Could not download HTML"
-
-            echo "🧩 Building offline index.html"
-            INDEX="${TARGET_DIR}/index.html"
-
-            # پیدا کردن بهترین صفحه برای نمایش
-            MAIN_PAGE=$(find "$TARGET_DIR" -type f \( -name "index.html" -o -name "*.html" \) | head -n 1)
-
-            echo "<html><head><meta charset='UTF-8'><title>Offline Site Viewer</title></head><body>" > "$INDEX"
-            echo "<h1>Offline Viewer for $URL</h1>" >> "$INDEX"
-
-            if [ -n "$MAIN_PAGE" ]; then
-              REL=$(realpath --relative-to="$TARGET_DIR" "$MAIN_PAGE")
-              echo "<p><a href='$REL'>Open main page</a></p>" >> "$INDEX"
+            # Option 1: Using monolith (Recommended - embeds everything)
+            monolith "$URL" \
+              --no-audio \
+              --no-video \
+              --no-fonts \
+              --isolate \
+              -o "$OUTPUT_FILE" && echo "✅ Successfully saved to $OUTPUT_FILE" || {
+              
+              echo "⚠️ Monolith failed, trying wget single-page method..."
+              
+              # Fallback Option 2: wget with single page + inline assets
+              wget \
+                --page-requisites \
+                --convert-links \
+                --adjust-extension \
+                --no-directories \
+                --span-hosts \
+                --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+                --timeout=20 \
+                --tries=3 \
+                -e robots=off \
+                -P "$DOMAIN" \
+                "$URL"
+              
+              # Merge CSS and JS into HTML file (basic approach)
+              if [ -f "${DOMAIN}"/*.html ]; then
+                cp "${DOMAIN}"/*.html "$OUTPUT_FILE"
+              fi
+            }
+            
+            # Verify file was created
+            if [ -f "$OUTPUT_FILE" ]; then
+              FILESIZE=$(du -h "$OUTPUT_FILE" | cut -f1)
+              echo "📊 File created: $OUTPUT_FILE ($FILESIZE)"
             else
-              echo "<p>No main page found. Showing fallback.</p>" >> "$INDEX"
-              echo "<p><a href='fallback.html'>Open fallback</a></p>" >> "$INDEX"
+              echo "❌ Failed to create file for $URL"
             fi
-
-            echo "<h2>All pages</h2><ul>" >> "$INDEX"
-            find "$TARGET_DIR" -type f -name "*.html" | while read FILE; do
-              REL=$(realpath --relative-to="$TARGET_DIR" "$FILE")
-              echo "<li><a href='$REL'>$REL</a></li>" >> "$INDEX"
-            done
-            echo "</ul></body></html>" >> "$INDEX"
-
           done
+
+      - name: Create index page for browsing
+        run: |
+          cat > sites/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>AVASAM Downloaded Sites</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+              .site { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+              a { color: #0066cc; text-decoration: none; font-size: 18px; }
+              a:hover { text-decoration: underline; }
+            </style>
+          </head>
+          <бody>
+            <h1>🌐 Downloaded Websites</h1>
+          EOF
+          
+          for file in sites/*.html; do
+            [ "$file" = "sites/index.html" ] && continue
+            filename=$(basename "$file")
+            echo "<div class='site'><a href='$filename'>📄 $filename</a></div>" >> sites/index.html
+          done
+          
+          echo "</body></html>" >> sites/index.html
 
       - name: Commit & Push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-
+          
           git add sites/
-          git commit -m "[AVASAM] Deep website download + offline viewer" || echo "Nothing to commit"
+          git commit -m "[AVASAM] Single-file website downloads" || echo "Nothing to commit"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin HEAD:"${GITHUB_REF_NAME}"
