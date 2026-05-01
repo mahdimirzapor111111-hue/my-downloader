@@ -1,4 +1,4 @@
-name: AVASAM - Safe Website Downloader
+name: AVASAM-SITE-PRO-MAX
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         type: string
 
 jobs:
-  download:
+  promax:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,45 +18,103 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install tools
+      - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget curl
+          sudo apt-get install -y wget curl nodejs npm
 
-      - name: Download websites safely
+      - name: Install Playwright
+        run: |
+          npm install -g playwright
+          playwright install chromium
+
+      - name: Create PRO-MAX script
+        run: |
+          cat << 'EOF' > promax.js
+          const fs = require('fs');
+          const path = require('path');
+          const { chromium } = require('playwright');
+
+          async function downloadSite(url, outDir) {
+            console.log("🌐 Starting PRO-MAX capture:", url);
+
+            if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+
+            const browser = await chromium.launch();
+            const page = await browser.newPage();
+
+            const assets = new Set();
+
+            page.on('response', async (response) => {
+              try {
+                const req = response.request();
+                const resourceUrl = req.url();
+
+                if (!resourceUrl.startsWith("http")) return;
+
+                const ext = path.extname(resourceUrl).split("?")[0];
+                const allowed = ['.png','.jpg','.jpeg','.gif','.webp','.svg','.css','.js','.mp4','.webm','.woff','.woff2','.ttf','.otf'];
+
+                if (allowed.includes(ext)) {
+                  assets.add(resourceUrl);
+                }
+              } catch {}
+            });
+
+            await page.goto(url, { waitUntil: 'networkidle' });
+
+            const html = await page.content();
+            fs.writeFileSync(path.join(outDir, "index.html"), html);
+
+            console.log("📦 Downloading assets:", assets.size);
+
+            for (const assetUrl of assets) {
+              try {
+                const res = await page.request.get(assetUrl);
+                const buffer = await res.body();
+
+                const clean = assetUrl.replace(/https?:\/\//, '').replace(/[^\w.-]/g, '_');
+                const filePath = path.join(outDir, clean);
+
+                fs.writeFileSync(filePath, buffer);
+              } catch (e) {
+                console.log("⚠️ Failed asset:", assetUrl);
+              }
+            }
+
+            await browser.close();
+            console.log("✅ PRO-MAX capture complete:", url);
+          }
+
+          const urls = process.argv.slice(2);
+          for (const url of urls) {
+            const safe = url.replace(/https?:\/\//, '').replace(/[^\w.-]/g, '_');
+            downloadSite(url, `sites/${safe}`);
+          }
+          EOF
+
+      - name: Run PRO-MAX engine
+        run: |
+          node promax.js ${{ github.event.inputs.urls }}
+
+      - name: Fallback Mirror (if needed)
         run: |
           URLS="${{ github.event.inputs.urls }}"
-          mkdir -p sites
-
           for URL in $URLS; do
-            SAFE_NAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]/_/g')
-            TARGET_DIR="sites/${SAFE_NAME}"
-            HTML_FILE="${TARGET_DIR}.html"
+            SAFE=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g')
+            DIR="sites/${SAFE}"
 
-            echo "🌐 Processing $URL"
-
-            mkdir -p "$TARGET_DIR"
-
-            echo "🕸 Trying full mirror..."
-            wget \
-              --mirror \
-              --convert-links \
-              --adjust-extension \
-              --page-requisites \
-              --no-parent \
-              -P "$TARGET_DIR" \
-              "$URL" || echo "⚠️ Mirror failed, falling back to HTML-only"
-
-            echo "📄 Saving HTML fallback"
-            curl -L --fail "$URL" -o "$HTML_FILE" || echo "❌ Could not download HTML"
+            if [ ! -f "$DIR/index.html" ]; then
+              echo "⚠️ PRO-MAX failed, running wget mirror..."
+              wget --mirror --convert-links --adjust-extension --page-requisites --no-parent -P "$DIR" "$URL" || true
+            fi
           done
 
       - name: Commit & Push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-
           git add sites/
-          git commit -m "[AVASAM] Website download" || echo "Nothing to commit"
+          git commit -m "[AVASAM-SITE-PRO-MAX] Full website snapshot" || echo "Nothing to commit"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin HEAD:"${GITHUB_REF_NAME}"
