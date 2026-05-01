@@ -1,26 +1,12 @@
-name: AVASAM - Download & View Websites
+name: AVASAM - Download Website HTML
 
 on:
   workflow_dispatch:
     inputs:
       urls:
-        description: 'لیست URLهای سایت‌ها (مثل https://youtube.com)'
+        description: 'آدرس سایت (مثال: https://youtube.com)'
         required: true
         type: string
-      view_mode:
-        description: 'حالت نمایش'
-        required: false
-        default: 'html'
-        type: choice
-        options:
-          - html      # فقط صفحه اصلی
-          - full      # دانلود کامل سایت (CSS, JS, Images)
-          - single    # یک فایل HTML ساده
-      split_threshold_mb:
-        description: 'تقسیم فایل‌های بزرگتر از (۰ = هرگز تقسیم نشود)'
-        required: false
-        default: 90
-        type: number
 
 jobs:
   save-website:
@@ -33,267 +19,90 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget zip httrack
-
-      - name: AVASAM Website Downloader
-        run: |
-          echo "🏷️ AVASAM - Website Archiver"
-          echo "🌐 https://avasam.ir"
-          echo ""
-
       - name: Download websites
         run: |
-          MODE="${{ github.event.inputs.view_mode }}"
           URLS="${{ github.event.inputs.urls }}"
           
-          mkdir -p downloads/www
-          mkdir -p downloads/snapshots
-
+          # پوشه برای ذخیره سایت‌ها
+          mkdir -p saved-sites
+          
           for URL in $URLS; do
-            # ساخت نام پوشه از روی URL
-            SITE_NAME=$(echo "$URL" | sed 's|https\?://||' | sed 's|/|_|g')
+            # ساخت نام فایل از آدرس سایت
+            FILENAME=$(echo "$URL" | sed 's|https\?://||' | sed 's|/|_|g')
             
-            if [ "$MODE" = "full" ]; then
-              echo "📥 Downloading full website: $URL"
-              # httrack برای دانلود کامل سایت
-              httrack "$URL" -O "downloads/www/$SITE_NAME" \
-                --depth=3 \
-                --mirror \
-                --robots=0 \
-                --quiet
+            echo "🌐 Downloading: $URL"
+            
+            # دانلود HTML صفحه با تمام منابع لازم
+            wget \
+              --mirror \
+              --page-requisites \
+              --html-extension \
+              --convert-links \
+              --adjust-extension \
+              --no-parent \
+              --directory-prefix="saved-sites" \
+              --output-document="saved-sites/${FILENAME}.html" \
+              "$URL"
               
-              # ایجاد فایل ایندکس برای نمایش
-              echo "<html><head><meta http-equiv='refresh' content='0;url=./$SITE_NAME/index.html'></head></html>" \
-                > "downloads/www/$SITE_NAME.html"
-              
-            elif [ "$MODE" = "single" ]; then
-              echo "📄 Downloading single page: $URL"
-              wget --page-requisites \
-                   --adjust-extension \
-                   --convert-links \
-                   --directory-prefix="downloads/www/$SITE_NAME" \
-                   --output-document="downloads/www/$SITE_NAME/index.html" \
-                   "$URL"
-            else
-              # حالت html ساده
-              echo "🌐 Saving HTML snapshot: $URL"
-              wget -O "downloads/snapshots/${SITE_NAME}.html" "$URL"
-            fi
+            echo "✅ Saved: saved-sites/${FILENAME}.html"
           done
-
-      - name: Create main viewer page
-        run: |
-          cat > downloads/index.html << 'EOF'
+          
+          # ساخت صفحه اصلی برای دسترسی آسان
+          cat > saved-sites/index.html << 'HTMLLIST'
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AVASAM Web Viewer - آرشیو وب‌سایت‌ها</title>
+    <title>AVASAM - سایت‌های ذخیره شده</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Tahoma', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .header {
-            background: linear-gradient(135deg, #ff0000, #cc0000);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .header h1 { font-size: 28px; margin-bottom: 10px; }
-        .sites-list {
-            padding: 30px;
-        }
-        .site-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: transform 0.2s;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-        .site-card:hover {
-            transform: translateY(-5px);
-            border-color: #ff0000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .site-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .site-url {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 15px;
-            word-break: break-all;
-        }
-        .view-btn {
-            background: linear-gradient(135deg, #ff0000, #cc0000);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .preview-frame {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            z-index: 1000;
-            display: none;
-            border: none;
-        }
-        .close-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: red;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 1001;
-            font-weight: bold;
-        }
-        .footer {
-            text-align: center;
+            font-family: Tahoma, Arial;
+            max-width: 800px;
+            margin: 50px auto;
             padding: 20px;
             background: #f0f0f0;
-            font-size: 12px;
-            color: #666;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        a {
+            color: #0066cc;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            color: #333;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📦 AVASAM Web Viewer</h1>
-            <p>مشاهده وب‌سایت‌های آرشیو شده بدون محدودیت</p>
-            <small>🌐 https://avasam.ir</small>
-        </div>
-        
-        <div class="sites-list" id="sitesList">
-            <div style="text-align: center; padding: 50px;">
-                ⏳ در حال بارگذاری لیست سایت‌ها...
-            </div>
-        </div>
-        
-        <div class="footer">
-            🔒 این سایت‌ها توسط AVASAM آرشیو شده‌اند<br>
-            ⚡ با استفاده از GitHub Actions - دسترسی آزاد به محتوای وب
-        </div>
-    </div>
-    
-    <iframe id="previewFrame" class="preview-frame"></iframe>
-    
-    <script>
-        // لیست فایل‌های آرشیو شده
-        async function loadSites() {
-            try {
-                const response = await fetch('sites.json');
-                const sites = await response.json();
-                displaySites(sites);
-            } catch(e) {
-                // اگر فایل json نبود، از لیست پیش‌فرض استفاده کن
-                loadFromDirectory();
-            }
-        }
-        
-        function loadFromDirectory() {
-            // اسکن خودکار پوشه snapshots و www
-            const sites = [
-                { name: "YouTube", url: "/snapshots/youtube.com.html", type: "snapshot" },
-                { name: "Other Sites", url: "/www", type: "full" }
-            ];
-            displaySites(sites);
-        }
-        
-        function displaySites(sites) {
-            const container = document.getElementById('sitesList');
-            container.innerHTML = '';
-            
-            sites.forEach(site => {
-                const card = document.createElement('div');
-                card.className = 'site-card';
-                card.innerHTML = `
-                    <div class="site-title">🌐 ${site.name}</div>
-                    <div class="site-url">${site.url}</div>
-                    <button class="view-btn" onclick="viewSite('${site.url}')">👁️ مشاهده سایت</button>
-                `;
-                container.appendChild(card);
-            });
-        }
-        
-        function viewSite(url) {
-            const frame = document.getElementById('previewFrame');
-            frame.style.display = 'block';
-            frame.src = url;
-            
-            // دکمه بستن
-            if (!document.getElementById('customCloseBtn')) {
-                const closeBtn = document.createElement('button');
-                closeBtn.id = 'customCloseBtn';
-                closeBtn.className = 'close-btn';
-                closeBtn.innerHTML = '✖ بستن';
-                closeBtn.onclick = () => {
-                    frame.style.display = 'none';
-                    frame.src = 'about:blank';
-                };
-                document.body.appendChild(closeBtn);
-            }
-        }
-        
-        loadSites();
-    </script>
-</body>
-</html>
-EOF
+    <h1>📁 سایت‌های ذخیره شده توسط AVASAM</h1>
+    <p>🌐 https://avasam.ir</p>
+    <hr>
+HTMLLIST
 
-      - name: Create sites list JSON
-        run: |
-          cat > downloads/sites.json << EOF
-          {
-            "sites": [
-              {
-                "name": "YouTube",
-                "url": "/snapshots/youtube.com.html",
-                "date": "$(date +%Y-%m-%d)",
-                "type": "snapshot"
-              }
-            ]
-          }
-          EOF
+          # لیست همه فایل‌های HTML به جز index.html
+          for file in saved-sites/*.html; do
+            if [ "$file" != "saved-sites/index.html" ]; then
+              filename=$(basename "$file")
+              echo "<div class='card'><a href='$filename' target='_blank'>📄 $filename</a></div>" >> saved-sites/index.html
+            fi
+          done
+          
+          echo "</body></html>" >> saved-sites/index.html
 
       - name: Commit & Push
         run: |
-          BRANCH="${GITHUB_REF_NAME}"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           
-          git add downloads/
-          git commit -m "[AVASAM] Add website archives - $(date +%Y%m%d_%H%M%S)" || echo "Nothing to commit"
-          git pull --rebase origin "$BRANCH"
-          git push origin HEAD:"$BRANCH"
+          git add saved-sites/
+          git commit -m "[AVASAM] Save websites - $(date +%Y%m%d_%H%M%S)" || echo "Nothing to commit"
+          git push
