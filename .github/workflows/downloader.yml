@@ -1,71 +1,313 @@
-name: AVASAM - Deep Asset Website Downloader
+name: Full Android Project Builder
 
 on:
+  push:
+    branches: [ "main" ]
   workflow_dispatch:
-    inputs:
-      urls:
-        description: 'Space-separated list of website URLs'
-        required: true
-        type: string
 
 jobs:
-  download:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout source
+      uses: actions/checkout@v3
 
-      - name: Install tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget curl
+    # 1) اگر پروژه Gradle ندارد → خودش می‌سازد
+    - name: Generate Gradle project structure if missing
+      run: |
+        if [ ! -f "settings.gradle" ]; then
+          echo "include ':app'" > settings.gradle
+        fi
 
-      - name: Deep Website Downloader (AVASAM)
-        run: |
-          URLS="${{ github.event.inputs.urls }}"
-          mkdir -p sites
+        if [ ! -f "build.gradle" ]; then
+          cat <<EOF > build.gradle
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.0'
+    }
+}
 
-          for URL in $URLS; do
-            SAFE_NAME=$(echo "$URL" | sed 's~https\?://~~; s~/~_~g; s/[^A-Za-z0-9._-]/_/g')
-            TARGET_DIR="sites/${SAFE_NAME}"
-            HTML_FILE="${TARGET_DIR}.html"
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+EOF
+        fi
 
-            echo "🌐 Processing $URL"
-            mkdir -p "$TARGET_DIR"
+        mkdir -p app
 
-            echo "🕸 Deep mirror with assets..."
-            wget \
-              --recursive \
-              --level=5 \
-              --page-requisites \
-              --convert-links \
-              --adjust-extension \
-              --no-parent \
-              --span-hosts \
-              --domains=$(echo "$URL" | awk -F/ '{print $3}') \
-              --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
-              --accept="html,htm,css,js,jpg,jpeg,png,gif,webp,svg,mp4,webm,ogg,mp3,woff,woff2,ttf,otf,json" \
-              --timeout=20 \
-              --tries=3 \
-              -e robots=off \
-              -P "$TARGET_DIR" \
-              "$URL" || echo "⚠️ Mirror failed, falling back to HTML-only"
+        if [ ! -f "app/build.gradle" ]; then
+          cat <<EOF > app/build.gradle
+plugins {
+    id 'com.android.application'
+}
 
-            echo "📄 Saving HTML fallback"
-            curl -L --fail \
-              -H "User-Agent: Mozilla/5.0" \
-              "$URL" -o "$HTML_FILE" || echo "❌ Could not download HTML"
-          done
+android {
+    namespace "com.example.application"
+    compileSdk 34
 
-      - name: Commit & Push
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+    defaultConfig {
+        applicationId "com.example.application"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
 
-          git add sites/
-          git commit -m "[AVASAM] Deep website download" || echo "Nothing to commit"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin HEAD:"${GITHUB_REF_NAME}"
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {}
+EOF
+        fi
+
+        mkdir -p app/src/main/java/com/example/application
+        mkdir -p app/src/main/res/layout
+        mkdir -p app/src/main/res/values
+
+        # اگر AndroidManifest وجود ندارد → خودش می‌سازد
+        if [ ! -f "app/src/main/AndroidManifest.xml" ]; then
+          cat <<EOF > app/src/main/AndroidManifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.application">
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
+    <application
+        android:label="HUD App"
+        android:theme="@style/AppTheme">
+
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".FloatingService"
+            android:exported="false"/>
+
+    </application>
+
+</manifest>
+EOF
+        fi
+
+        # اگر MainActivity وجود ندارد → خودش می‌سازد
+        if [ ! -f "app/src/main/java/com/example/application/MainActivity.java" ]; then
+          cat <<EOF > app/src/main/java/com/example/application/MainActivity.java
+package com.example.application;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.content.Intent;
+import android.widget.Toast;
+
+public class MainActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (!Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, "Allow overlay permission", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+            startActivity(intent);
+        } else {
+            startService(new Intent(this, FloatingService.class));
+        }
+
+        finish();
+    }
+}
+EOF
+        fi
+
+        # اگر FloatingService وجود ندارد → خودش می‌سازد
+        if [ ! -f "app/src/main/java/com/example/application/FloatingService.java" ]; then
+          cat <<EOF > app/src/main/java/com/example/application/FloatingService.java
+package com.example.application;
+
+import android.app.Service;
+import android.content.Intent;
+import android.graphics.PixelFormat;
+import android.os.IBinder;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class FloatingService extends Service {
+
+    WindowManager wm;
+    View inputView, outputView;
+
+    int distance = 200;
+
+    @Override
+    public IBinder onBind(Intent intent) { return null; }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+
+        inputView = LayoutInflater.from(this).inflate(R.layout.floating_input, null);
+        final EditText input = inputView.findViewById(R.id.inputDistance);
+        Button btn = inputView.findViewById(R.id.btnApply);
+
+        outputView = LayoutInflater.from(this).inflate(R.layout.floating_output, null);
+        final TextView txtPhi = outputView.findViewById(R.id.txtPhi);
+        final TextView txtRight = outputView.findViewById(R.id.txtRight);
+        final TextView txtLeft = outputView.findViewById(R.id.txtLeft);
+
+        final WindowManager.LayoutParams inParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+
+        inParams.gravity = Gravity.TOP | Gravity.START;
+        inParams.x = 50;
+        inParams.y = 200;
+
+        final WindowManager.LayoutParams outParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+
+        outParams.gravity = Gravity.TOP | Gravity.START;
+        outParams.x = 50;
+        outParams.y = 350;
+
+        wm.addView(inputView, inParams);
+        wm.addView(outputView, outParams);
+
+        btn.setOnClickListener(v -> {
+            try {
+                distance = Integer.parseInt(input.getText().toString());
+            } catch (Exception ignored) {}
+        });
+
+        new Thread(() -> {
+            while (true) {
+                final double[] ang = calc(distance);
+                txtPhi.post(() -> {
+                    txtPhi.setText("φ: " + ang[0] + "°");
+                    txtRight.setText("Right: " + ang[1] + "°");
+                    txtLeft.setText("Left: " + ang[2] + "°");
+                });
+                try { Thread.sleep(300); } catch (Exception ignored) {}
+            }
+        }).start();
+
+        makeDraggable(inputView, inParams);
+        makeDraggable(outputView, outParams);
+    }
+
+    double[] calc(int dist) {
+        int[] d = {164,179,188,260,265,279};
+        int[] a = {-3,-1,-1,6,7,8};
+
+        double right = 0;
+
+        if (dist <= d[0]) {
+            double s = (a[1]-a[0])/(double)(d[1]-d[0]);
+            right = a[0] + s*(dist-d[0]);
+        } else if (dist >= d[5]) {
+            double s = (a[5]-a[4])/(double)(d[5]-d[4]);
+            right = a[5] + s*(dist-d[5]);
+        } else {
+            for (int i=0;i<5;i++) {
+                if (dist>=d[i] && dist<=d[i+1]) {
+                    double s = (a[i+1]-a[i])/(double)(d[i+1]-d[i]);
+                    right = a[i] + s*(dist-d[i]);
+                    break;
+                }
+            }
+        }
+
+        double left;
+        if (right>=-90 && right<=90) left = 180-right;
+        else left = -180 + (180 - Math.abs(right));
+
+        return new double[]{
+                Math.round(right*100)/100.0,
+                Math.round(right*100)/100.0,
+                Math.round(left*100)/100.0
+        };
+    }
+
+    void makeDraggable(final View v, final WindowManager.LayoutParams params) {
+        v.setOnTouchListener((view, e) -> {
+            switch (e.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    params.x = params.x;
+                    params.y = params.y;
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    params.x += (int)(e.getRawX());
+                    params.y += (int)(e.getRawY());
+                    wm.updateViewLayout(v, params);
+                    return true;
+            }
+            return false;
+        });
+    }
+}
+EOF
+        fi
+
+        # layout files
+        echo "<LinearLayout></LinearLayout>" > app/src/main/res/layout/floating_input.xml
+        echo "<LinearLayout></LinearLayout>" > app/src/main/res/layout/floating_output.xml
+
+    # 2) نصب JDK
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: "temurin"
+        java-version: "17"
+
+    # 3) نصب Android SDK
+    - name: Install Android SDK
+      uses: android-actions/setup-android@v3
+
+    # 4) Build APK
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+
+    # 5) ذخیره APK داخل پروژه
+    - name: Save APK inside project
+      run: |
+        mkdir -p built-apk
+        cp app/build/outputs/apk/debug/*.apk built-apk/
+
+    # 6) Artifact
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: HUDApp-APK
+        path: built-apk/*.apk
